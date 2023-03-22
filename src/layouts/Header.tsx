@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router'
 
-import Logo from '../components/logo'
+import Logo from '../components/Logo'
 
 export default function Header() {
 	const { pathname } = useLocation()
