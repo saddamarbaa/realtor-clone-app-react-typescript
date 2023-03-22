@@ -1,10 +1,11 @@
 import {
-	BrowserRouter,
+	BrowserRouter as Router,
 	Routes,
 	Route,
 	Navigate,
 	Outlet,
 } from 'react-router-dom'
+import Layout from './layouts'
 
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen'
 import HomeScreen from './screens/HomeScreen'
@@ -16,17 +17,19 @@ import SignUpScreen from './screens/SignUpScreen'
 
 function App() {
 	return (
-		<BrowserRouter>
-			<Routes>
-				<Route path="/" element={<HomeScreen />} />
-				<Route path="/profile" element={<ProfileScreen />} />
-				<Route path="/sign-up" element={<SignUpScreen />} />
-				<Route path="/sign-in" element={<SignInScreen />} />
-				<Route path="/forgot-password" element={<ForgotPasswordScreen />} />
-				<Route path="/offers" element={<OffersScreen />} />
-				<Route path="*" element={<NotFoundScreen />} />
-			</Routes>
-		</BrowserRouter>
+		<Router>
+			<Layout>
+				<Routes>
+					<Route path="/" element={<HomeScreen />} />
+					<Route path="/profile" element={<ProfileScreen />} />
+					<Route path="/sign-up" element={<SignUpScreen />} />
+					<Route path="/sign-in" element={<SignInScreen />} />
+					<Route path="/forgot-password" element={<ForgotPasswordScreen />} />
+					<Route path="/offers" element={<OffersScreen />} />
+					<Route path="*" element={<NotFoundScreen />} />
+				</Routes>
+			</Layout>
+		</Router>
 	)
 }
 
