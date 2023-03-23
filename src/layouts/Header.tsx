@@ -14,32 +14,37 @@ export default function Header() {
 				<Logo />
 				<ul className="flex flex-col items-center space-y-1 sm:flex-row sm:space-x-10 sm:space-y-0">
 					<li
-						className={`cursor-pointer   py-3 text-sm font-semibold text-gray-400 transition-all duration-300 hover:border-b-[3px]  hover:border-b-red-500  ${
-							pathMathRoute('/') && 'border-b-[3px] border-b-red-500 text-black'
+						className={`cursor-pointer  py-3 text-sm font-semibold  transition-all duration-300 hover:border-b-[3px]  hover:border-b-red-500  ${
+							pathMathRoute('/')
+								? 'border-b-[3px] border-b-red-500 text-black'
+								: 'text-gray-400'
 						}`}
 						onClick={() => navigate('/')}>
 						Home
 					</li>
 					<li
-						className={`cursor-pointer   py-3 text-sm font-semibold text-gray-400 transition-all duration-300 hover:border-b-[3px]  hover:border-b-red-500 ${
-							pathMathRoute('/offers') &&
-							'border-b-[3px] border-b-red-500 text-black'
+						className={`cursor-pointer  py-3 text-sm font-semibold transition-all duration-300 hover:border-b-[3px]  hover:border-b-red-500 ${
+							pathMathRoute('/offers')
+								? 'border-b-[3px] border-b-red-500 text-black'
+								: 'text-gray-400'
 						}`}
 						onClick={() => navigate('/offers')}>
 						Offers
 					</li>
 					<li
-						className={`cursor-pointer   py-3 text-sm font-semibold text-gray-400 transition-all duration-300 hover:border-b-[3px]  hover:border-b-red-500   ${
-							pathMathRoute('/sign-in') &&
-							'border-b-[3px] border-b-red-500 text-black'
+						className={`cursor-pointer  py-3 text-sm font-semibold  transition-all duration-300 hover:border-b-[3px]  hover:border-b-red-500   ${
+							pathMathRoute('/sign-in')
+								? 'border-b-[3px] border-b-red-500 text-black'
+								: 'text-gray-400'
 						}`}
 						onClick={() => navigate('/sign-in')}>
 						Log in
 					</li>
 					<li
-						className={`cursor-pointer   py-3 text-sm font-semibold text-gray-400 transition-all duration-300 hover:border-b-[3px]  hover:border-b-red-500   ${
-							pathMathRoute('/sign-up') &&
-							'border-b-[3px] border-b-red-500 text-black'
+						className={`cursor-pointer   py-3 text-sm font-semibold transition-all duration-300 hover:border-b-[3px]  hover:border-b-red-500   ${
+							pathMathRoute('/sign-up')
+								? 'border-b-[3px] border-b-red-500 text-black'
+								: 'text-gray-400'
 						}`}
 						onClick={() => navigate('/sign-up')}>
 						Sign up

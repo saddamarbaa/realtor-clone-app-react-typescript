@@ -1,10 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
-  theme: {
+	content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+	theme: {
 		extend: {
 			lineClamp: {
 				7: '7',
@@ -16,7 +13,7 @@ module.exports = {
 			},
 		},
 	},
-  variants: {
+	variants: {
 		lineClamp: ['responsive'],
 	},
 	plugins: [require('@tailwindcss/line-clamp')],
