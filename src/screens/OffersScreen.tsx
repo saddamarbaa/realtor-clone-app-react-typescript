@@ -1,9 +1,9 @@
-import React from 'react'
+import React from 'react';
 
-type Props = {}
+type Props = {};
 
 function OffersScreen({}: Props) {
-	return <div>OffersScreen</div>
+  return <div>OffersScreen</div>;
 }
 
-export default OffersScreen
+export default OffersScreen;

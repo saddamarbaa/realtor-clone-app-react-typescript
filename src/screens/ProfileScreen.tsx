@@ -1,7 +1,7 @@
-import React from 'react'
+import React from 'react';
 
-type Props = {}
+type Props = {};
 
 export default function ProfileScreen({}: Props) {
-	return <div>ProfileScreen</div>
+  return <div>ProfileScreen</div>;
 }
