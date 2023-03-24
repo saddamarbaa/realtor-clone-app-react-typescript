@@ -3,16 +3,19 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { BsEyeFill, BsEyeSlashFill } from 'react-icons/bs';
 import { Link, useNavigate } from 'react-router-dom';
-import { FcGoogle } from 'react-icons/fc';
+import { toast } from 'react-toastify';
 import { z as zod } from 'zod';
 
 import Button from '../components/Button';
 import { signInSchemaValidation } from '../utils/schemaValidation/auth';
+import { auth, signInWithEmailAndPassword } from '../config/firebase';
+import OAuth from '../components/OAuth';
 
 type ValidationSchemaT = zod.infer<typeof signInSchemaValidation>;
 
 export default function SignInScreen() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -21,12 +24,20 @@ export default function SignInScreen() {
     resolver: zodResolver(signInSchemaValidation),
   });
 
-  const onSubmit: SubmitHandler<ValidationSchemaT> = (data) => {
+  const signInWithEmailAndPasswordHandler: SubmitHandler<ValidationSchemaT> = async (data) => {
     console.log(JSON.stringify(data, null, 2));
-  };
 
-  const signInWithGoogleHandler = () => {
-    console.log('google login');
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+      if (userCredential.user) {
+        navigate('/');
+      }
+    } catch (error: any) {
+      // toast.error("Something went wrong with the registration");
+      const errorCode = error?.code;
+      const errorMessage = error?.message;
+      toast.error(errorMessage || 'Bad user credentials');
+    }
   };
 
   return (
@@ -37,7 +48,7 @@ export default function SignInScreen() {
           <img src="/key.jpg" alt="key" className="w-full rounded-2xl" />
         </div>
         <div className="w-full md:w-[67%] lg:ml-20 lg:w-[40%]">
-          <form className="flex w-full flex-col space-y-5" onSubmit={handleSubmit(onSubmit)}>
+          <form className="flex w-full flex-col space-y-5" onSubmit={handleSubmit(signInWithEmailAndPasswordHandler)}>
             <div>
               <input
                 className={`focus:shadow-outline w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
@@ -104,9 +115,7 @@ export default function SignInScreen() {
                 OR
               </p>
             </div>
-            <Button color="red" Icon={FcGoogle} onClick={signInWithGoogleHandler}>
-              Sign with Google
-            </Button>
+            <OAuth />
           </div>
         </div>
       </div>
