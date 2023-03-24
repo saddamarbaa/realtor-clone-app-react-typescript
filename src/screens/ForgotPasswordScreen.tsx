@@ -1,15 +1,18 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { FcGoogle } from 'react-icons/fc';
 import { z as zod } from 'zod';
+import { toast } from 'react-toastify';
 
 import Button from '../components/Button';
 import { forgotPasswordSchemaValidation } from '../utils/schemaValidation/auth';
+import { auth, sendPasswordResetEmail } from '../config/firebase';
+import OAuth from '../components/OAuth';
 
 type ValidationSchemaT = zod.infer<typeof forgotPasswordSchemaValidation>;
 
 export default function ForgotPasswordScreen() {
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -18,12 +21,19 @@ export default function ForgotPasswordScreen() {
     resolver: zodResolver(forgotPasswordSchemaValidation),
   });
 
-  const onSubmit: SubmitHandler<ValidationSchemaT> = (data) => {
+  const sendPasswordResetEmailHandler: SubmitHandler<ValidationSchemaT> = async (data) => {
     console.log(JSON.stringify(data, null, 2));
-  };
-
-  const signInWithGoogleHandler = () => {
-    console.log('google login');
+    try {
+      const userCredential = await sendPasswordResetEmail(auth, data.email);
+      toast.success(`Password reset link sent! to ${data.email} please check your email `);
+      setTimeout(() => {
+        navigate('/sign-in');
+      }, 0);
+    } catch (error: any) {
+      const errorCode = error?.code;
+      const errorMessage = error?.message;
+      toast.error(errorMessage || 'Bad user credentials');
+    }
   };
 
   return (
@@ -34,7 +44,7 @@ export default function ForgotPasswordScreen() {
           <img src="/key.jpg" alt="key" className="w-full rounded-2xl" />
         </div>
         <div className="w-full md:w-[67%] lg:ml-20 lg:w-[40%]">
-          <form className="flex w-full flex-col space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <form className="flex w-full flex-col space-y-4" onSubmit={handleSubmit(sendPasswordResetEmailHandler)}>
             <div>
               <input
                 className={`focus:shadow-outline w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
@@ -76,9 +86,7 @@ export default function ForgotPasswordScreen() {
                 OR
               </p>
             </div>
-            <Button color="red" Icon={FcGoogle} onClick={signInWithGoogleHandler}>
-              Sign with Google
-            </Button>
+            <OAuth />
           </div>
         </div>
       </div>
