@@ -33,7 +33,6 @@ export default function SignInScreen() {
         navigate('/');
       }
     } catch (error: any) {
-      // toast.error("Something went wrong with the registration");
       const errorCode = error?.code;
       const errorMessage = error?.message;
       toast.error(errorMessage || 'Bad user credentials');
