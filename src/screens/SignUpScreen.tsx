@@ -3,17 +3,22 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { BsEyeFill, BsEyeSlashFill } from 'react-icons/bs';
 import { Link, useNavigate } from 'react-router-dom';
-import { FcGoogle } from 'react-icons/fc';
 import { z as zod } from 'zod';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 
 import Button from '../components/Button';
 import { signUpSchemaValidation } from '../utils/schemaValidation/auth';
+import { auth, createUserWithEmailAndPassword, db, updateProfile } from '../config/firebase';
+import OAuth from '../components/OAuth';
 
 type ValidationSchemaT = zod.infer<typeof signUpSchemaValidation>;
 
 export default function SignUpScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setConfirmPassword] = useState(false);
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -22,12 +27,35 @@ export default function SignUpScreen() {
     resolver: zodResolver(signUpSchemaValidation),
   });
 
-  const onSubmit: SubmitHandler<ValidationSchemaT> = (data) => {
+  //  Function to Create User with given name and password
+  const registerUserWithEmailAndPasswordHandler: SubmitHandler<ValidationSchemaT> = async (data) => {
     console.log(JSON.stringify(data, null, 2));
-  };
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, data.email, data.password);
 
-  const signInWithGoogleHandler = () => {
-    console.log('google login');
+      if (auth?.currentUser) {
+        updateProfile(auth?.currentUser, {
+          displayName: data.name,
+        });
+      }
+      const user = userCredential?.user;
+      // console.log('Signed in', userCredential);
+
+      const transformedCredential = {
+        name: data.name,
+        email: data.email,
+        timestamp: serverTimestamp(),
+      };
+      // Add the user to db
+      await setDoc(doc(db, 'users', user.uid), transformedCredential);
+      toast.success('Sign up was successful');
+      navigate('/sign-in');
+    } catch (error: any) {
+      // toast.error("Something went wrong with the registration");
+      const errorCode = error?.code;
+      const errorMessage = error?.message;
+      toast.error(errorMessage || 'Something went wrong with the registration');
+    }
   };
 
   return (
@@ -38,7 +66,10 @@ export default function SignUpScreen() {
           <img src="/key.jpg" alt="key" className="w-full rounded-2xl" />
         </div>
         <div className="w-full md:w-[67%] lg:ml-20 lg:w-[40%]">
-          <form className="flex w-full flex-col space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <form
+            className="flex w-full flex-col space-y-4"
+            onSubmit={handleSubmit(registerUserWithEmailAndPasswordHandler)}
+          >
             <div>
               <input
                 className={`focus:shadow-outline w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
@@ -155,9 +186,7 @@ export default function SignUpScreen() {
                 OR
               </p>
             </div>
-            <Button color="red" Icon={FcGoogle} onClick={signInWithGoogleHandler}>
-              Sign with Google
-            </Button>
+            <OAuth />
           </div>
         </div>
       </div>
