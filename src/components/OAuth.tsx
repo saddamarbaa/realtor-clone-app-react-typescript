@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
 import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { FcGoogle } from 'react-icons/fc';
+import { FirebaseError } from 'firebase/app';
 
 import { auth, db, GoogleAuthProvider, googleProvider, signInWithPopup } from '../config/firebase';
 import Button from './Button';
@@ -30,14 +31,10 @@ export default function OAuth() {
         });
       }
       navigate('/');
-    } catch (error: any) {
-      // Handle Errors here.
-      const errorCode = error?.code;
-      const errorMessage = error?.message;
-      // The email of the user's account used.
-      const email = error.customData.email;
-      // The AuthCredential type that was used.
-      const credential = GoogleAuthProvider?.credentialFromError(error);
+    } catch (error: unknown) {
+      const firebaseError = error as FirebaseError;
+      const errorCode = firebaseError?.code;
+      const errorMessage = firebaseError?.message;
       toast.error(errorMessage || 'Something went wrong with the registration');
     }
   };

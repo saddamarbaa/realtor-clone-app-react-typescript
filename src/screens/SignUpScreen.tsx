@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { z as zod } from 'zod';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { toast } from 'react-toastify';
+import { FirebaseError } from 'firebase/app';
 
 import Button from '../components/Button';
 import { signUpSchemaValidation } from '../utils/schemaValidation/auth';
@@ -50,10 +51,10 @@ export default function SignUpScreen() {
       await setDoc(doc(db, 'users', user.uid), transformedCredential);
       toast.success('Sign up was successful');
       navigate('/sign-in');
-    } catch (error: any) {
-      // toast.error("Something went wrong with the registration");
-      const errorCode = error?.code;
-      const errorMessage = error?.message;
+    } catch (error: unknown) {
+      const firebaseError = error as FirebaseError;
+      const errorCode = firebaseError?.code;
+      const errorMessage = firebaseError?.message;
       toast.error(errorMessage || 'Something went wrong with the registration');
     }
   };

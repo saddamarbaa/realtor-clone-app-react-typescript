@@ -58,3 +58,16 @@ export const forgotPasswordSchemaValidation = zod.object({
     .max(50, { message: 'Email must not exceed 50 characters' })
     .email({ message: 'Email is invalid' }),
 });
+
+export const profileSchemaValidation = zod.object({
+  name: zod
+    .string()
+    .nonempty({ message: 'Name is required' })
+    .min(3, { message: 'Name must be at least 3 characters' })
+    .max(15, { message: 'Name must not exceed 15 characters' }),
+  email: zod
+    .string()
+    .min(1, { message: 'Email is required' })
+    .max(50, { message: 'Email must not exceed 50 characters' })
+    .email({ message: 'Email is invalid' }),
+});
