@@ -2,6 +2,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { Navigate, Outlet } from 'react-router';
 
 import { auth } from '../config/firebase';
+import Spinner from './Spinner';
 
 export default function PrivateRoute() {
   const [user, loading, error] = useAuthState(auth);
@@ -10,9 +11,8 @@ export default function PrivateRoute() {
 
   if (loading) {
     return (
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12">
-        <p className="mt-8 w-full max-w-lg rounded border bg-white p-6 text-center font-bold">Initialising User...</p>
-      </div>
+      // Initialising User...
+      <Spinner />
     );
   }
 

@@ -31,7 +31,7 @@ export default function ProfileScreen() {
     resolver: zodResolver(profileSchemaValidation),
   });
 
-  console.log(user?.displayName, loading, error);
+  // console.log(user?.displayName, loading, error);
 
   useEffect(() => {
     if (user && user.email) {
@@ -76,7 +76,7 @@ export default function ProfileScreen() {
       {loading ? (
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center  px-6 py-12">
           <p className="mt-8 w-full max-w-lg rounded  border bg-white p-6 text-center font-bold">
-            Initialising User...
+            Initializing User...
           </p>
         </div>
       ) : null}
