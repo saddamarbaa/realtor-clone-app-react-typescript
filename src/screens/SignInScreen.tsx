@@ -5,6 +5,7 @@ import { BsEyeFill, BsEyeSlashFill } from 'react-icons/bs';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { z as zod } from 'zod';
+import { FirebaseError } from 'firebase/app';
 
 import Button from '../components/Button';
 import { signInSchemaValidation } from '../utils/schemaValidation/auth';
@@ -32,9 +33,10 @@ export default function SignInScreen() {
       if (userCredential.user) {
         navigate('/');
       }
-    } catch (error: any) {
-      const errorCode = error?.code;
-      const errorMessage = error?.message;
+    } catch (error: unknown) {
+      const firebaseError = error as FirebaseError;
+      const errorCode = firebaseError?.code;
+      const errorMessage = firebaseError?.message;
       toast.error(errorMessage || 'Bad user credentials');
     }
   };

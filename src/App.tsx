@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import PrivateRoute from './components/PrivateRoute';
 
 import Layout from './layouts';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
@@ -17,7 +18,9 @@ function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<HomeScreen />} />
-          <Route path="/profile" element={<ProfileScreen />} />
+          <Route path="/profile" element={<PrivateRoute />}>
+            <Route path="/profile" element={<ProfileScreen />} />
+          </Route>
           <Route path="/sign-up" element={<SignUpScreen />} />
           <Route path="/sign-in" element={<SignInScreen />} />
           <Route path="/forgot-password" element={<ForgotPasswordScreen />} />

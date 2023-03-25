@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Link, useNavigate } from 'react-router-dom';
 import { z as zod } from 'zod';
 import { toast } from 'react-toastify';
+import { FirebaseError } from 'firebase/app';
 
 import Button from '../components/Button';
 import { forgotPasswordSchemaValidation } from '../utils/schemaValidation/auth';
@@ -29,9 +30,10 @@ export default function ForgotPasswordScreen() {
       setTimeout(() => {
         navigate('/sign-in');
       }, 0);
-    } catch (error: any) {
-      const errorCode = error?.code;
-      const errorMessage = error?.message;
+    } catch (error: unknown) {
+      const firebaseError = error as FirebaseError;
+      const errorCode = firebaseError?.code;
+      const errorMessage = firebaseError?.message;
       toast.error(errorMessage || 'Bad user credentials');
     }
   };
