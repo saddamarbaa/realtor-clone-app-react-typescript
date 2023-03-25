@@ -1,8 +1,11 @@
 import { useLocation, useNavigate } from 'react-router';
+import { useAuthState } from 'react-firebase-hooks/auth';
 
 import Logo from '../components/Logo';
+import { auth } from '../config/firebase';
 
 export default function Header() {
+  const [user, loading, error] = useAuthState(auth);
   const { pathname } = useLocation();
   const navigate = useNavigate();
 
@@ -30,20 +33,14 @@ export default function Header() {
             Offers
           </li>
           <li
-            className={`cursor-pointer  py-3 text-sm font-semibold  transition-all duration-300 hover:border-b-[3px]  hover:border-b-red-500   ${
-              pathMathRoute('/sign-in') ? 'border-b-[3px] border-b-red-500 text-black' : 'text-gray-400'
-            }`}
-            onClick={() => navigate('/sign-in')}
-          >
-            Log in
-          </li>
-          <li
             className={`cursor-pointer   py-3 text-sm font-semibold transition-all duration-300 hover:border-b-[3px]  hover:border-b-red-500   ${
-              pathMathRoute('/sign-up') ? 'border-b-[3px] border-b-red-500 text-black' : 'text-gray-400'
+              pathMathRoute('/sign-in') || pathMathRoute('/profile')
+                ? 'border-b-[3px] border-b-red-500 text-black'
+                : 'text-gray-400'
             }`}
-            onClick={() => navigate('/sign-up')}
+            onClick={() => navigate('/profile')}
           >
-            Sign up
+            {!loading && user ? 'Profile' : 'Sign In'}
           </li>
         </ul>
       </header>
