@@ -7,10 +7,12 @@ import { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
 import { FirebaseError } from 'firebase/app';
+import { FcHome } from 'react-icons/fc';
 
 import { profileSchemaValidation } from '../utils/schemaValidation/auth';
 import Button from '../components/Button';
 import { auth, db, updateProfile } from '../config/firebase';
+import { Link } from 'react-router-dom';
 
 type ValidationSchemaT = zod.infer<typeof profileSchemaValidation>;
 
@@ -90,7 +92,7 @@ export default function ProfileScreen() {
         <>
           <h1 className="mt-6 text-center  text-2xl font-bold md:text-3xl">My Profile</h1>
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12">
-            <div className="w-full max-w-lg">
+            <div className="flex w-full max-w-lg flex-col space-y-4">
               <form className="flex w-full flex-col space-y-6" onSubmit={handleSubmit(updateProfileHandler)}>
                 <div>
                   <input
@@ -151,8 +153,10 @@ export default function ProfileScreen() {
                     Sign out
                   </button>
                 </div>
-                <Button isDisabled={!changeDetail}>Submit</Button>
               </form>
+              <Link to="/create-listing">
+                <Button Icon={FcHome}>Sell or rent your home</Button>
+              </Link>
             </div>
           </div>
         </>

@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { IconType } from 'react-icons';
 
 type Props = {
@@ -10,6 +10,9 @@ type Props = {
   Icon?: IconType;
   iconClass?: string;
   children: ReactNode;
+  buttonClassName?: string;
+  type?: 'submit' | 'button' | 'reset';
+  id?: string;
 };
 
 export default function Button({
@@ -20,7 +23,10 @@ export default function Button({
   isLoading = false,
   isDisabled = false,
   iconClass = 'mr-2 rounded-full  bg-white  text-2xl',
+  buttonClassName = 'text-white',
   Icon,
+  type = 'submit',
+  id,
 }: Props) {
   const sizes = {
     small: 'py-1 px-2 text-sm',
@@ -34,8 +40,10 @@ export default function Button({
 
   const colors: Colors = {
     blue: 'bg-blue-500 hover:bg-blue-700 active:bg-blue-800',
-    red: 'bg-red-500 hover:bg-red-700',
+    red: 'bg-red-500 hover:bg-red-700 text-white',
     green: 'bg-green-500 hover:bg-green-700 active:bg-green-800',
+    slate: 'bg-slate-600 hover:bg-slate-700 active:bg-slate-800',
+    white: 'bg-white',
   };
 
   // add disabled and loading states to button
@@ -44,9 +52,11 @@ export default function Button({
 
   return (
     <button
+      id={id}
+      type={type}
       onClick={onClick}
       disabled={isDisabled}
-      className={`flex items-center justify-center rounded uppercase text-white shadow-md transition duration-150 ease-out hover:shadow-lg  ${sizes[size]} ${colors[color]} ${disabledClass} ${loadingClass}`}
+      className={`flex w-full items-center justify-center rounded uppercase shadow-md transition duration-150 ease-out hover:shadow-lg  ${sizes[size]} ${colors[color]} ${disabledClass} ${loadingClass} ${buttonClassName}`}
     >
       {/* show loading spinner if isLoading is true */}
       {Icon ? <Icon className={iconClass} /> : null}
