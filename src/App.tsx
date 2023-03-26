@@ -4,6 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import PrivateRoute from './components/PrivateRoute';
 
 import Layout from './layouts';
+import CreateListingScreen from './screens/CreateListingScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
 import HomeScreen from './screens/HomeScreen';
 import NotFoundScreen from './screens/NotFoundScreen';
@@ -25,6 +26,7 @@ function App() {
           <Route path="/sign-in" element={<SignInScreen />} />
           <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
           <Route path="/offers" element={<OffersScreen />} />
+          <Route path="/create-listing" element={<CreateListingScreen />} />
           <Route path="*" element={<NotFoundScreen />} />
         </Routes>
 
