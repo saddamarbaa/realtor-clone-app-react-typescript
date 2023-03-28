@@ -26,7 +26,9 @@ function App() {
           <Route path="/sign-in" element={<SignInScreen />} />
           <Route path="/forgot-password" element={<ForgotPasswordScreen />} />
           <Route path="/offers" element={<OffersScreen />} />
-          <Route path="/create-listing" element={<CreateListingScreen />} />
+          <Route path="/create-listing" element={<PrivateRoute />}>
+            <Route path="/create-listing" element={<CreateListingScreen />} />
+          </Route>
           <Route path="*" element={<NotFoundScreen />} />
         </Routes>
 

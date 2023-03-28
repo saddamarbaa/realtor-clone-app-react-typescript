@@ -3,16 +3,28 @@ import { useEffect, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { z as zod } from 'zod';
 import { FaTrash } from 'react-icons/fa';
+import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
+import { getAuth } from 'firebase/auth';
+import { v4 as uuidv4 } from 'uuid';
+import { toast } from 'react-toastify';
 
 import Button from '../components/Button';
 import { listingSchemaValidation } from '../utils/schemaValidation/Listing';
+import Spinner from '../components/Spinner';
+import { auth, db } from '../config/firebase';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { useNavigate } from 'react-router';
 
 type ValidationSchemaT = zod.infer<typeof listingSchemaValidation>;
 
 export default function OffersScreen() {
+  const navigate = useNavigate();
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-
+  const [geolocationEnabled, setGeoLocationEnabled] = useState(false);
+  const [user, error] = useAuthState(auth);
+  const [loading, setLoading] = useState(false);
   const {
     register,
     setValue,
@@ -36,8 +48,8 @@ export default function OffersScreen() {
       parking: false,
       furnished: false,
       offer: false,
-      // latitude: 0,
-      // longitude: 0,
+      latitude: 0,
+      longitude: 0,
     });
   }, []);
 
@@ -50,31 +62,100 @@ export default function OffersScreen() {
     setImagePreviews(newPreviews);
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      setImageFiles([...files]);
+      const fileArray = Array.from(files);
+      const previewArray = fileArray.map((file) => URL.createObjectURL(file));
+      setImagePreviews((prev) => [...prev, ...previewArray]);
+    }
+  };
+
+  async function storeImage(image: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const storage = getStorage();
+      const filename = `${user?.uid}-${image.name}-${uuidv4()}`;
+      const storageRef = ref(storage, filename);
+      const uploadTask = uploadBytesResumable(storageRef, image);
+
+      // Register three observers:
+      // 1. 'state_changed' observer, called any time the state changes
+      // 2. Error observer, called on failure
+      // 3. Completion observer, called on successful completion
+      uploadTask.on(
+        'state_changed',
+        (snapshot) => {
+          // Observe state change events such as progress, pause, and resume
+          // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          console.log('Upload is ' + progress + '% done');
+          switch (snapshot.state) {
+            case 'paused':
+              console.log('Upload is paused');
+              break;
+            case 'running':
+              console.log('Upload is running');
+              break;
+          }
+        },
+        (error) => {
+          // Handle unsuccessful uploads
+          console.log('Upload failed');
+          reject(error);
+        },
+        () => {
+          // Handle successful uploads on complete
+          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
+          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            resolve(downloadURL);
+          });
+        }
+      );
+    });
+  }
+
   const onSubmit: SubmitHandler<ValidationSchemaT> = async (data) => {
-    console.log(data);
+    setLoading(true);
+    const geolocation = {
+      lat: data.latitude || -8.3405389,
+      lng: data.longitude || 115.0919509,
+    };
+
     try {
-      const result = listingSchemaValidation.parse(data);
-      console.log('Valid data:', result);
-      // TODO: Submit form data to server
-      return result; // return the validated data object
+      // const result = listingSchemaValidation.parse(data);
+      // console.log('Valid data:', result);
+
+      if (imageFiles.length) {
+        const imgUrls = await Promise.all([...imageFiles].map((image) => storeImage(image))).catch((error) => {
+          setLoading(false);
+          toast.error('Images not uploaded');
+          return;
+        });
+
+        const formDataCopy = {
+          ...data,
+          imgUrls,
+          geolocation,
+          timestamp: serverTimestamp(),
+          userRef: user?.uid,
+        };
+
+        const docRef = await addDoc(collection(db, 'listings'), formDataCopy);
+
+        setLoading(false);
+        toast.success('Listing created');
+        navigate(`/category/${formDataCopy.type}/${docRef.id}`);
+      }
     } catch (error) {
       console.error('Validation error:', error);
-      // TODO: Handle validation errors
       throw error;
     }
   };
 
-  const onchangeHandler = () => {};
-
-  const onFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-      const previewArray = fileArray.map((file) => URL.createObjectURL(file));
-      setImagePreviews((prev) => [...prev, ...previewArray]);
-      // reset({ images: [...fileArray] });
-    }
-  };
+  if (loading) {
+    return <Spinner />;
+  }
 
   return (
     <section className="py-20">
@@ -219,7 +300,7 @@ export default function OffersScreen() {
                 Address
               </label>
               <textarea
-                className={`focus:shadow-outline block w-full resize-none appearance-none rounded border p-3 leading-tight shadow transition duration-300  ease-in-out focus:outline-none disabled:cursor-not-allowed ${
+                className={`focus:shadow-outline block w-full resize-none appearance-none rounded border p-3  leading-tight shadow transition duration-300 ease-in-out focus:outline-none disabled:cursor-not-allowed ${
                   errors.address
                     ? ' border border-red-500 bg-[#ffe6e6]'
                     : 'border-gray-400 bg-white hover:border-gray-500'
@@ -231,7 +312,39 @@ export default function OffersScreen() {
               />
               {errors.address && <p className="mt-2 pl-1 text-xs text-red-500">{errors.address?.message}</p>}
             </div>
+            {!geolocationEnabled ? (
+              <div className="flex w-full space-x-3">
+                <div className="w-full">
+                  <label htmlFor="name" className="text-xl font-semibold md:text-lg">
+                    Latitude
+                  </label>
+                  <input
+                    className={`focus:shadow-outline w-full appearance-none rounded border  border-gray-400 bg-white p-3 text-center leading-tight shadow transition duration-300 hover:border-gray-500 focus:outline-none `}
+                    type="number"
+                    id="latitude"
+                    min="-90"
+                    max="90"
+                    {...register('latitude')}
+                    placeholder={'Latitude'}
+                  />
+                </div>
 
+                <div className="w-full">
+                  <label htmlFor="name" className="text-xl font-semibold md:text-lg">
+                    longitude
+                  </label>
+                  <input
+                    className={`focus:shadow-outline w-full appearance-none rounded border  border-gray-400 bg-white p-3 text-center leading-tight shadow transition duration-300 hover:border-gray-500 focus:outline-none `}
+                    type="number"
+                    id="longitude"
+                    min="-180"
+                    max="180"
+                    {...register('longitude')}
+                    placeholder={'Longitude'}
+                  />
+                </div>
+              </div>
+            ) : null}
             <div>
               <label htmlFor="address" className="text-xl font-semibold md:text-lg">
                 Description
@@ -344,10 +457,9 @@ export default function OffersScreen() {
               <input
                 disabled={imagePreviews && imagePreviews.length == 3}
                 className={`focus:shadow-outline w-full appearance-none rounded border  border-gray-400 bg-white p-3 leading-tight shadow  transition duration-300 hover:border-gray-500 focus:outline-none  disabled:cursor-not-allowed`}
-                // {...register('images')}
                 type="file"
                 id="images"
-                onChange={onFileSelect}
+                onChange={handleImageChange}
                 multiple
                 required
                 max="3"
