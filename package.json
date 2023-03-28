@@ -25,6 +25,7 @@
     "react-router-dom": "^6.9.0",
     "react-toastify": "^9.1.2",
     "sort-by": "^1.2.0",
+    "uuidv4": "^6.2.13",
     "zod": "^3.21.4"
   },
   "devDependencies": {
