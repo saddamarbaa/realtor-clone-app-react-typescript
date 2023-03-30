@@ -1,0 +1,171 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "airbnb",
+    "airbnb-typescript",
+    "airbnb/hooks",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "plugin:tailwindcss/recommended",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "prettier"
+  ],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "plugins": [
+    "react",
+    "@typescript-eslint",
+    "simple-import-sort",
+    "import",
+    "jsx-a11y",
+    "react-hooks",
+    "eslint-plugin-react",
+    "tailwindcss",
+    "prettier"
+  ],
+  "rules": {
+    "prettier/prettier": ["error"],
+    "jsx-a11y/no-noninteractive-element-interactions": "off",
+    "@typescript-eslint/no-shadow": "off",
+    "@typescript-eslint/no-unused-expressions": "off",
+    "react-hooks/exhaustive-deps": "off",
+    // Based Rule
+    "jsx-a11y/label-has-associated-control": "off",
+    "import/no-cycle": "off",
+    "consistent-return": "off",
+    "default-param-last": "off",
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "mjs": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
+    ],
+
+    "import/no-extraneous-dependencies": "off",
+    "import/prefer-default-export": "off",
+    "import/no-unresolved": [
+      0,
+      {
+        "commonjs": true,
+        "amd": true
+      }
+    ],
+    "import/named": 2,
+    "import/namespace": 2,
+    "import/default": 2,
+    "import/export": 2,
+
+    "import/first": "error",
+    "import/newline-after-import": "error",
+    "import/no-duplicates": "error",
+    "simple-import-sort/imports": [
+      "error",
+      {
+        "groups": [
+          // Node.js builtins
+          [
+            "^(assert|buffer|child_process|cluster|console|constants|crypto|dgram|dns|domain|events|fs|http|https|module|net|os|path|punycode|querystring|readline|repl|stream|string_decoder|sys|timers|tls|tty|url|util|vm|zlib|freelist|v8|process|async_hooks|http2|perf_hooks)(/.*|$)"
+          ],
+          // Packages. `react` related packages come first
+          ["^react", "^@?\\w"],
+          // Side effect imports
+          ["^\\u0000"],
+          // Internal packages
+          ["^(src|internals)(/.*|$)"],
+          // Parent imports. Put `..` last
+          ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+          // Other relative imports. Put same-folder imports and `.` last
+          ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+          // Style imports
+          ["^.+\\.s?css$"]
+        ]
+      }
+    ],
+    "simple-import-sort/exports": "error",
+    "tailwindcss/classnames-order": [
+      "warn",
+      {
+        "officialSorting": true
+      }
+    ],
+    "no-shadow": "off",
+    "no-console": "warn",
+    "no-nested-ternary": 0,
+    "no-underscore-dangle": 0,
+    "no-use-before-define": 0,
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_"
+      }
+    ],
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/no-use-before-define": "warn",
+    "@typescript-eslint/no-explicit-any": "off",
+    "jsx-a11y/control-has-associated-label": "off",
+
+    "jsx-a11y/click-events-have-key-events": "off",
+    "jsx-a11y/no-static-element-interactions": "off",
+    "react/no-unescaped-entities": 0,
+    "jsx-a11y/href-no-hash": 0,
+    "jsx-a11y/anchor-is-valid": [
+      "error",
+      {
+        "components": ["Link"],
+        "specialLink": ["hrefLeft", "hrefRight"],
+        "aspects": ["invalidHref", "preferButton"]
+      }
+    ],
+    "arrow-parens": ["error", "always"],
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true,
+        "allowTemplateLiterals": false
+      }
+    ],
+
+    "require-jsdoc": "off",
+    "react/react-in-jsx-scope": "off",
+
+    // React Based Rules
+    "react/jsx-filename-extension": [
+      "error",
+      {
+        "extensions": [".js", ".jsx", ".tsx"]
+      }
+    ],
+    "react/jsx-props-no-spreading": "off",
+    "react/require-default-props": "off",
+    "react/button-has-type": "off"
+  },
+  "settings": {
+    "import/parsers": {
+      "@typescript-eslint/parser": [".ts", ".tsx"]
+    },
+    "import/extensions": [".js", ".mjs", ".jsx", ".ts", ".tsx"],
+    "react": {
+      // Tells eslint-plugin-react to automatically detect the version of React to use.
+      "version": "detect"
+      //   "version": "latest"
+    }
+  },
+  "overrides": []
+}
