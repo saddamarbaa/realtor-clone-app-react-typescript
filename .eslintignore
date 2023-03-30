@@ -33,3 +33,7 @@ env.d.ts
 # Vite
 vite.config.ts
 src/vite-env.d.ts
+
+
+// Husky
+husky.config.js
