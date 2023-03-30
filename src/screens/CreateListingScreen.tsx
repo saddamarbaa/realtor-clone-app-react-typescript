@@ -1,20 +1,18 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { z as zod } from 'zod';
-import { FaTrash } from 'react-icons/fa';
-import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
-import { getAuth } from 'firebase/auth';
-import { v4 as uuidv4 } from 'uuid';
-import { toast } from 'react-toastify';
-
-import Button from '../components/Button';
-import { listingSchemaValidation } from '../utils/schemaValidation/Listing';
-import Spinner from '../components/Spinner';
-import { auth, db } from '../config/firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { FaTrash } from 'react-icons/fa';
 import { useNavigate } from 'react-router';
+import { toast } from 'react-toastify';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Button from 'components/Button';
+import Spinner from 'components/Spinner';
+import { auth, db } from 'config/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { getDownloadURL, getStorage, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
+import { listingSchemaValidation } from 'utils/index';
+import { v4 as uuidv4 } from 'uuid';
+import { z as zod } from 'zod';
 
 type ValidationSchemaT = zod.infer<typeof listingSchemaValidation>;
 
@@ -63,7 +61,7 @@ export default function OffersScreen() {
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+    const { files } = e.target;
     if (files) {
       setImageFiles([...files]);
       const fileArray = Array.from(files);
@@ -89,7 +87,8 @@ export default function OffersScreen() {
           // Observe state change events such as progress, pause, and resume
           // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
           const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log('Upload is ' + progress + '% done');
+          console.log(`Upload is ${progress}% done`);
+          // eslint-disable-next-line default-case
           switch (snapshot.state) {
             case 'paused':
               console.log('Upload is paused');
@@ -110,7 +109,7 @@ export default function OffersScreen() {
           getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
             resolve(downloadURL);
           });
-        }
+        },
       );
     });
   }
@@ -130,7 +129,6 @@ export default function OffersScreen() {
         const imgUrls = await Promise.all([...imageFiles].map((image) => storeImage(image))).catch((error) => {
           setLoading(false);
           toast.error('Images not uploaded');
-          return;
         });
 
         const formDataCopy = {
@@ -158,18 +156,18 @@ export default function OffersScreen() {
   }
 
   return (
-    <section className="py-20">
-      <h1 className="mt-6 text-center text-3xl font-bold">Create Listing</h1>
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12">
-        <div className="flex w-full max-w-md flex-col space-y-4">
-          <form className="flex w-full flex-col space-y-6" onSubmit={handleSubmit(onSubmit)}>
+    <section className='py-20'>
+      <h1 className='mt-6 text-center text-3xl font-bold'>Create Listing</h1>
+      <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12'>
+        <div className='flex w-full max-w-md flex-col space-y-4'>
+          <form className='flex w-full flex-col space-y-6' onSubmit={handleSubmit(onSubmit)}>
             <div>
-              <p className="text-xl font-semibold md:text-lg">Sell/Rent</p>
-              <div className="flex items-center space-x-5">
+              <p className='text-xl font-semibold md:text-lg'>Sell/Rent</p>
+              <div className='flex items-center space-x-5'>
                 <Button
                   color={watch('type') === 'rent' ? 'white' : 'slate'}
                   buttonClassName={watch('type') === 'rent' ? 'text-black' : 'text-white'}
-                  type="button"
+                  type='button'
                   onClick={() => setValue('type', 'sale')}
                 >
                   Sell
@@ -177,7 +175,7 @@ export default function OffersScreen() {
                 <Button
                   color={watch('type') === 'sale' ? 'white' : 'slate'}
                   buttonClassName={watch('type') === 'sale' ? 'text-black' : 'text-white'}
-                  type="button"
+                  type='button'
                   onClick={() => setValue('type', 'rent')}
                 >
                   Rent
@@ -186,100 +184,100 @@ export default function OffersScreen() {
             </div>
 
             <div>
-              <label htmlFor="name" className="text-xl font-semibold md:text-lg">
+              <label htmlFor='name' className='text-xl font-semibold md:text-lg'>
                 Name
               </label>
               <input
-                className={`focus:shadow-outline w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
+                className={`w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
                   errors.name ? ' border border-red-500 bg-[#ffe6e6]' : 'border-gray-400 bg-white hover:border-gray-500'
                 } `}
-                type="text"
-                id="name"
+                type='text'
+                id='name'
                 {...register('name')}
                 placeholder={`${errors.name ? '' : 'Name'}`}
               />
-              {errors.name && <p className="mt-2 pl-1 text-xs text-red-500">{errors.name?.message}</p>}
+              {errors.name && <p className='mt-2 pl-1 text-xs text-red-500'>{errors.name?.message}</p>}
             </div>
 
-            <div className="flex w-full items-center justify-between space-x-5">
+            <div className='flex w-full items-center justify-between space-x-5'>
               <div>
                 <div>
-                  <label htmlFor="beds" className="text-xl font-semibold md:text-lg">
+                  <label htmlFor='beds' className='text-xl font-semibold md:text-lg'>
                     Bed Rooms
                   </label>
                 </div>
                 <input
-                  className={`focus:shadow-outline w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
+                  className={`w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
                     errors.bedRoom
                       ? ' border border-red-500 bg-[#ffe6e6]'
                       : 'border-gray-400 bg-white hover:border-gray-500'
                   } `}
-                  type="number"
-                  id="bedRoom"
-                  min="0"
+                  type='number'
+                  id='bedRoom'
+                  min='0'
                   {...register('bedRoom', { valueAsNumber: true })}
                   placeholder={`${errors.bedRoom ? '' : ''}`}
                 />
-                {errors.bedRoom && <p className="mt-2 pl-1 text-xs text-red-500">{errors.bedRoom?.message}</p>}
+                {errors.bedRoom && <p className='mt-2 pl-1 text-xs text-red-500'>{errors.bedRoom?.message}</p>}
               </div>
 
               <div>
                 <div>
-                  <label htmlFor="beds" className="text-xl font-semibold md:text-lg">
+                  <label htmlFor='beds' className='text-xl font-semibold md:text-lg'>
                     Bath Rooms
                   </label>
                 </div>
                 <input
-                  className={`focus:shadow-outline w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
+                  className={`w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
                     errors.bathRoom
                       ? ' border border-red-500 bg-[#ffe6e6]'
                       : 'border-gray-400 bg-white hover:border-gray-500'
                   } `}
-                  type="number"
-                  id="bedRoom"
-                  min="0"
+                  type='number'
+                  id='bedRoom'
+                  min='0'
                   {...register('bathRoom', { valueAsNumber: true })}
                   placeholder={`${errors.bathRoom ? '' : ''}`}
                 />
-                {errors.bathRoom && <p className="mt-2 pl-1 text-xs text-red-500">{errors.bathRoom?.message}</p>}
+                {errors.bathRoom && <p className='mt-2 pl-1 text-xs text-red-500'>{errors.bathRoom?.message}</p>}
               </div>
             </div>
 
             <div>
-              <p className="text-xl font-semibold md:text-lg">Parking spot</p>
-              <div className="flex items-center space-x-5">
+              <p className='text-xl font-semibold md:text-lg'>Parking spot</p>
+              <div className='flex items-center space-x-5'>
                 <Button
                   color={!watch('parking') ? 'white' : 'slate'}
                   buttonClassName={!watch('parking') ? 'text-black' : 'text-white'}
-                  type="button"
-                  id="parking"
+                  type='button'
+                  id='parking'
                   onClick={() => setValue('parking', !getValues('parking'))}
                   // onClick={() => setValue('parking', true)}
                 >
                   Yes
                 </Button>
                 <Button
-                  id="parking"
+                  id='parking'
                   color={watch('parking') ? 'white' : 'slate'}
                   buttonClassName={watch('parking') ? 'text-black' : 'text-white'}
-                  type="button"
+                  type='button'
                   // onClick={() => setValue('parking', false)}
                   onClick={() => setValue('parking', !getValues('parking'))}
                 >
                   No
                 </Button>
               </div>
-              {errors.parking && <span className="text-red-500">{errors.parking.message}</span>}
+              {errors.parking && <span className='text-red-500'>{errors.parking.message}</span>}
             </div>
 
             <div>
-              <p className="text-xl font-semibold md:text-lg">Furnished</p>
-              <div className="flex items-center space-x-5">
+              <p className='text-xl font-semibold md:text-lg'>Furnished</p>
+              <div className='flex items-center space-x-5'>
                 <Button
                   color={!watch('furnished') ? 'white' : 'slate'}
                   buttonClassName={!watch('furnished') ? 'text-black' : 'text-white'}
-                  type="button"
-                  id="furnished"
+                  type='button'
+                  id='furnished'
                   onClick={() => setValue('furnished', true)}
                 >
                   yes
@@ -287,8 +285,8 @@ export default function OffersScreen() {
                 <Button
                   color={watch('furnished') ? 'white' : 'slate'}
                   buttonClassName={watch('furnished') ? 'text-black' : 'text-white'}
-                  type="button"
-                  id="furnished"
+                  type='button'
+                  id='furnished'
                   onClick={() => setValue('furnished', false)}
                 >
                   no
@@ -296,80 +294,80 @@ export default function OffersScreen() {
               </div>
             </div>
             <div>
-              <label htmlFor="address" className="text-xl font-semibold md:text-lg">
+              <label htmlFor='address' className='text-xl font-semibold md:text-lg'>
                 Address
               </label>
               <textarea
-                className={`focus:shadow-outline block w-full resize-none appearance-none rounded border p-3  leading-tight shadow transition duration-300 ease-in-out focus:outline-none disabled:cursor-not-allowed ${
+                className={`block w-full resize-none appearance-none rounded border p-3  leading-tight shadow transition duration-300 ease-in-out focus:outline-none disabled:cursor-not-allowed ${
                   errors.address
                     ? ' border border-red-500 bg-[#ffe6e6]'
                     : 'border-gray-400 bg-white hover:border-gray-500'
                 } `}
                 rows={3}
-                id="address"
+                id='address'
                 {...register('address')}
                 placeholder={`${errors.address ? '' : 'Address'}`}
               />
-              {errors.address && <p className="mt-2 pl-1 text-xs text-red-500">{errors.address?.message}</p>}
+              {errors.address && <p className='mt-2 pl-1 text-xs text-red-500'>{errors.address?.message}</p>}
             </div>
             {!geolocationEnabled ? (
-              <div className="flex w-full space-x-3">
-                <div className="w-full">
-                  <label htmlFor="name" className="text-xl font-semibold md:text-lg">
+              <div className='flex w-full space-x-3'>
+                <div className='w-full'>
+                  <label htmlFor='name' className='text-xl font-semibold md:text-lg'>
                     Latitude
                   </label>
                   <input
-                    className={`focus:shadow-outline w-full appearance-none rounded border  border-gray-400 bg-white p-3 text-center leading-tight shadow transition duration-300 hover:border-gray-500 focus:outline-none `}
-                    type="number"
-                    id="latitude"
-                    min="-90"
-                    max="90"
+                    className='w-full appearance-none rounded border  border-gray-400 bg-white p-3 text-center leading-tight shadow transition duration-300 hover:border-gray-500 focus:outline-none '
+                    type='number'
+                    id='latitude'
+                    min='-90'
+                    max='90'
                     {...register('latitude')}
-                    placeholder={'Latitude'}
+                    placeholder='Latitude'
                   />
                 </div>
 
-                <div className="w-full">
-                  <label htmlFor="name" className="text-xl font-semibold md:text-lg">
+                <div className='w-full'>
+                  <label htmlFor='name' className='text-xl font-semibold md:text-lg'>
                     longitude
                   </label>
                   <input
-                    className={`focus:shadow-outline w-full appearance-none rounded border  border-gray-400 bg-white p-3 text-center leading-tight shadow transition duration-300 hover:border-gray-500 focus:outline-none `}
-                    type="number"
-                    id="longitude"
-                    min="-180"
-                    max="180"
+                    className='w-full appearance-none rounded border  border-gray-400 bg-white p-3 text-center leading-tight shadow transition duration-300 hover:border-gray-500 focus:outline-none '
+                    type='number'
+                    id='longitude'
+                    min='-180'
+                    max='180'
                     {...register('longitude')}
-                    placeholder={'Longitude'}
+                    placeholder='Longitude'
                   />
                 </div>
               </div>
             ) : null}
             <div>
-              <label htmlFor="address" className="text-xl font-semibold md:text-lg">
+              <label htmlFor='address' className='text-xl font-semibold md:text-lg'>
                 Description
               </label>
               <textarea
-                className={`focus:shadow-outline block w-full resize-none appearance-none rounded border p-3 leading-tight shadow transition duration-300  ease-in-out focus:outline-none disabled:cursor-not-allowed ${
+                className={`block w-full resize-none appearance-none rounded border p-3 leading-tight shadow transition duration-300  ease-in-out focus:outline-none disabled:cursor-not-allowed ${
                   errors.description
                     ? ' border border-red-500 bg-[#ffe6e6]'
                     : 'border-gray-400 bg-white hover:border-gray-500'
                 } `}
                 rows={3}
-                id="description"
+                id='description'
                 {...register('description')}
                 placeholder={`${errors.description ? '' : 'Description'}`}
               />
-              {errors.description && <p className="mt-2 pl-1 text-xs text-red-500">{errors.description?.message}</p>}
+              {errors.description && <p className='mt-2 pl-1 text-xs text-red-500'>{errors.description?.message}</p>}
             </div>
             <div>
-              <p className="text-xl font-semibold md:text-lg">Offer</p>
-              <div className="flex items-center space-x-5">
+              <p className='text-xl font-semibold md:text-lg'>Offer</p>
+              <div className='flex items-center space-x-5'>
                 <Button
                   color={!watch('offer') ? 'white' : 'slate'}
                   buttonClassName={!watch('offer') ? 'text-black' : 'text-white'}
-                  type="button"
-                  id="offer"
+                  type='button'
+                  id='offer'
                   onClick={() => setValue('offer', true)}
                 >
                   Yes
@@ -377,8 +375,8 @@ export default function OffersScreen() {
                 <Button
                   color={watch('offer') ? 'white' : 'slate'}
                   buttonClassName={watch('offer') ? 'text-black' : 'text-white'}
-                  type="button"
-                  id="offer"
+                  type='button'
+                  id='offer'
                   onClick={() => setValue('offer', false)}
                 >
                   no
@@ -386,93 +384,93 @@ export default function OffersScreen() {
               </div>
             </div>
 
-            <div className="flex w-full items-center space-x-3">
+            <div className='flex w-full items-center space-x-3'>
               <div>
                 <div>
-                  <label htmlFor="price" className="text-xl font-semibold md:text-lg">
+                  <label htmlFor='price' className='text-xl font-semibold md:text-lg'>
                     Regular Price
                   </label>
                 </div>
                 <input
-                  className={`focus:shadow-outline w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
+                  className={`w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
                     errors.regularPrice
                       ? ' border border-red-500 bg-[#ffe6e6]'
                       : 'border-gray-400 bg-white hover:border-gray-500'
                   } `}
-                  type="number"
-                  id="price"
+                  type='number'
+                  id='price'
                   min={0}
-                  inputMode="numeric"
+                  inputMode='numeric'
                   {...register('regularPrice', { valueAsNumber: true })}
                   placeholder={`${errors.regularPrice ? '' : 'Regular Price'}`}
                   defaultValue={0}
                 />
 
                 {errors.regularPrice && (
-                  <p className="mt-2 pl-1 text-xs text-red-500">{errors.regularPrice?.message}</p>
+                  <p className='mt-2 pl-1 text-xs text-red-500'>{errors.regularPrice?.message}</p>
                 )}
               </div>
-              <div className="pt-5">$ / Month</div>
+              <div className='pt-5'>$ / Month</div>
             </div>
 
             {watch('offer') ? (
-              <div className="flex w-full items-center space-x-3">
+              <div className='flex w-full items-center space-x-3'>
                 <div>
                   <div>
-                    <label htmlFor="price" className="text-xl font-semibold md:text-lg">
+                    <label htmlFor='price' className='text-xl font-semibold md:text-lg'>
                       Discounted price
                     </label>
                   </div>
                   <input
-                    className={`focus:shadow-outline w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
+                    className={`w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
                       errors.discountedPrice
                         ? ' border border-red-500 bg-[#ffe6e6]'
                         : 'border-gray-400 bg-white hover:border-gray-500'
                     } `}
-                    type="number"
-                    id="discountedPrice"
+                    type='number'
+                    id='discountedPrice'
                     min={0}
-                    inputMode="numeric"
+                    inputMode='numeric'
                     {...register('discountedPrice', { valueAsNumber: true })}
                     placeholder={`${errors.discountedPrice ? '' : ''}`}
                   />
                   {errors.discountedPrice && (
-                    <p className="mt-2 pl-1 text-xs text-red-500">{errors.discountedPrice?.message}</p>
+                    <p className='mt-2 pl-1 text-xs text-red-500'>{errors.discountedPrice?.message}</p>
                   )}
                 </div>
                 watch('offer')
                 {watch('type') === 'rent' && (
-                  <div className="">
-                    <p className="text-md w-full whitespace-nowrap pt-5">$ / Month</p>
+                  <div className=''>
+                    <p className='w-full whitespace-nowrap pt-5 text-lg'>$ / Month</p>
                   </div>
                 )}
               </div>
             ) : null}
 
             <div>
-              <label htmlFor="name" className="text-xl font-semibold md:text-lg">
+              <label htmlFor='name' className='text-xl font-semibold md:text-lg'>
                 Images
               </label>
-              <p className="text-sm">The first image will be the cover (max 3).</p>
+              <p className='text-sm'>The first image will be the cover (max 3).</p>
               <input
-                disabled={imagePreviews && imagePreviews.length == 3}
-                className={`focus:shadow-outline w-full appearance-none rounded border  border-gray-400 bg-white p-3 leading-tight shadow  transition duration-300 hover:border-gray-500 focus:outline-none  disabled:cursor-not-allowed`}
-                type="file"
-                id="images"
+                disabled={imagePreviews && imagePreviews.length === 3}
+                className='w-full appearance-none rounded border  border-gray-400 bg-white p-3 leading-tight shadow  transition duration-300 hover:border-gray-500 focus:outline-none  disabled:cursor-not-allowed'
+                type='file'
+                id='images'
                 onChange={handleImageChange}
                 multiple
                 required
-                max="3"
-                accept=".jpg,.png,.jpeg,.webp"
+                max='3'
+                accept='.jpg,.png,.jpeg,.webp'
               />
 
-              <div className="flex flex-wrap">
+              <div className='flex flex-wrap'>
                 {imagePreviews.map((preview, index) => (
-                  <div key={preview} className="relative m-2">
-                    <img src={preview} alt="uploaded preview" className="h-32 w-32 rounded-lg object-cover" />
+                  <div key={preview} className='relative m-2'>
+                    <img src={preview} alt='uploaded preview' className='h-32 w-32 rounded-lg object-cover' />
                     <button
-                      type="button"
-                      className="absolute top-2 right-2 text-red-600 hover:text-red-500"
+                      type='button'
+                      className='absolute right-2 top-2 text-red-600 hover:text-red-500'
                       onClick={() => removeImage(index)}
                     >
                       <FaTrash />

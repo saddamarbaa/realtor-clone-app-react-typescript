@@ -1,7 +1,7 @@
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { Navigate, Outlet } from 'react-router';
+import { auth } from 'config/firebase';
 
-import { auth } from '../config/firebase';
 import Spinner from './Spinner';
 
 export default function PrivateRoute() {
@@ -18,18 +18,18 @@ export default function PrivateRoute() {
 
   if (error) {
     return (
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12">
-        <p className="mt-8 w-full max-w-lg rounded border bg-white p-6 text-center font-bold">Error</p>
+      <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12'>
+        <p className='mt-8 w-full max-w-lg rounded border bg-white p-6 text-center font-bold'>Error</p>
       </div>
     );
   }
 
   if (!user && !loading) {
-    return <Navigate to="/sign-in" />;
+    return <Navigate to='/sign-in' />;
   }
 
   return (
-    <section className="py-20">
+    <section className='py-20'>
       <Outlet />
     </section>
   );

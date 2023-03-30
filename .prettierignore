@@ -1,18 +1,10 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 /node_modules
 /.pnp
 .pnp.js
 
-# testing
-/coverage
-
-# next.js
-/.next/
-/out/
-
 # production
+dist/
 /build
 
 # misc
@@ -25,6 +17,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # local env files
+.env
 .env.local
 .env.development.local
 .env.test.local
@@ -35,3 +28,8 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+env.d.ts
+
+# Vite
+vite.config.ts
+src/vite-env.d.ts

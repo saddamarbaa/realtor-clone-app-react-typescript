@@ -1,6 +1,6 @@
 import React from 'react';
-import Footer from './Footer';
 
+import Footer from './Footer';
 import Header from './Header';
 
 type Props = {
@@ -9,9 +9,9 @@ type Props = {
 
 export default function Layout({ children }: Props) {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className='flex min-h-screen flex-col'>
       <Header />
-      <main className="flex flex-1 flex-col">{children}</main>
+      <main className='flex flex-1 flex-col'>{children}</main>
       <Footer />
     </div>
   );

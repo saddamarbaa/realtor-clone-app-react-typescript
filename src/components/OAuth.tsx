@@ -1,10 +1,11 @@
+import { FcGoogle } from 'react-icons/fc';
 import { useNavigate } from 'react-router';
 import { toast } from 'react-toastify';
-import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
-import { FcGoogle } from 'react-icons/fc';
 import { FirebaseError } from 'firebase/app';
+import { doc, getDoc, serverTimestamp, setDoc } from 'firebase/firestore';
 
 import { auth, db, GoogleAuthProvider, googleProvider, signInWithPopup } from '../config/firebase';
+
 import Button from './Button';
 
 export default function OAuth() {
@@ -40,7 +41,7 @@ export default function OAuth() {
   };
 
   return (
-    <Button color="red" Icon={FcGoogle} onClick={signInWithGoogleHandler}>
+    <Button color='red' Icon={FcGoogle} onClick={signInWithGoogleHandler}>
       Sign with Google
     </Button>
   );

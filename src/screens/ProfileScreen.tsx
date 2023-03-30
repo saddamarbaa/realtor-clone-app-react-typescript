@@ -1,26 +1,42 @@
-import { SubmitHandler, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z as zod } from 'zod';
-import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router';
 import { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { collection, deleteDoc, doc, getDocs, orderBy, query, updateDoc, where } from 'firebase/firestore';
-import { FirebaseError } from 'firebase/app';
+import { SubmitHandler, useForm } from 'react-hook-form';
 import { FcHome } from 'react-icons/fc';
-
-import { profileSchemaValidation } from '../utils/schemaValidation/auth';
-import Button from '../components/Button';
-import { auth, db, updateProfile } from '../config/firebase';
+import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Button from 'components/Button';
+import ListingItem from 'components/ListingItem';
+import { auth, db, updateProfile } from 'config/firebase';
+import { FirebaseError } from 'firebase/app';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  limit,
+  onSnapshot,
+  orderBy,
+  query,
+  QuerySnapshot,
+  updateDoc,
+  where,
+} from 'firebase/firestore';
+import { ListingT } from 'types/listing';
+import { profileSchemaValidation } from 'utils/index';
+import { z as zod } from 'zod';
 
 type ValidationSchemaT = zod.infer<typeof profileSchemaValidation>;
 
 export default function ProfileScreen() {
   const [user, loading, error] = useAuthState(auth);
   const [changeDetail, setChangeDetail] = useState(false);
-  const [listings, setListings] = useState(null);
+  const [listings, setListings] = useState<ListingT[]>([]);
+
   const navigate = useNavigate();
+
+  console.log(listings);
 
   const {
     register,
@@ -42,7 +58,25 @@ export default function ProfileScreen() {
         email: user.email,
       });
     }
-  }, [user]);
+  }, [user, reset]);
+
+  useEffect(() => {
+    const fetchUserListings = async () => {
+      const listingRef = collection(db, 'listings');
+      const q = query(listingRef, where('userRef', '==', user?.uid), orderBy('timestamp', 'desc'));
+      const querySnap = await getDocs(q);
+      const listingsData = querySnap.docs.map((doc) => {
+        return {
+          id: doc.id,
+          ...doc.data(),
+        };
+      });
+      setListings(listingsData as ListingT[]);
+    };
+    if (user?.uid) {
+      fetchUserListings();
+    }
+  }, [user?.uid]);
 
   const updateProfileHandler: SubmitHandler<ValidationSchemaT> = async (data) => {
     console.log(JSON.stringify(data, null, 2));
@@ -74,91 +108,101 @@ export default function ProfileScreen() {
   };
 
   return (
-    <section className="py-20">
+    <section className='py-20'>
       {loading ? (
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center  px-6 py-12">
-          <p className="mt-8 w-full max-w-lg rounded  border bg-white p-6 text-center font-bold">
+        <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center  px-6 py-12'>
+          <p className='mt-8 w-full max-w-lg rounded  border bg-white p-6 text-center font-bold'>
             Initializing User...
           </p>
         </div>
       ) : null}
 
       {error ? (
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center  px-6 py-12">
-          <p className="mt-8 w-full max-w-lg rounded  border bg-white p-6 text-center font-bold">Error</p>
+        <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center  px-6 py-12'>
+          <p className='mt-8 w-full max-w-lg rounded  border bg-white p-6 text-center font-bold'>Error</p>
         </div>
       ) : null}
       {user ? (
         <>
-          <h1 className="mt-6 text-center  text-2xl font-bold md:text-3xl">My Profile</h1>
-          <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12">
-            <div className="flex w-full max-w-lg flex-col space-y-4">
-              <form className="flex w-full flex-col space-y-6" onSubmit={handleSubmit(updateProfileHandler)}>
+          <h1 className='mt-6 text-center  text-2xl font-bold md:text-3xl'>My Profile</h1>
+          <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12'>
+            <div className='flex w-full max-w-lg flex-col space-y-4'>
+              <form className='flex w-full flex-col space-y-6' onSubmit={handleSubmit(updateProfileHandler)}>
                 <div>
                   <input
                     disabled={!changeDetail}
-                    className={`focus:shadow-outline w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300 ease-in-out focus:outline-none disabled:cursor-not-allowed
+                    className={`w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300 ease-in-out focus:outline-none disabled:cursor-not-allowed
                  ${
                    changeDetail && errors.name
                      ? ' border border-red-500 bg-[#ffe6e6]'
                      : 'border-gray-400 bg-white hover:border-gray-500'
                  }
                  ${changeDetail && !errors.name ? 'border border-green-500 hover:border-green-500' : ''} `}
-                    type="text"
-                    id="name"
+                    type='text'
+                    id='name'
                     {...register('name')}
                     placeholder={`${errors.name ? '' : 'Name'}`}
                   />
                   {changeDetail && errors.name && (
-                    <p className="mt-2 pl-1 text-xs text-red-500">{errors.name?.message}</p>
+                    <p className='mt-2 pl-1 text-xs text-red-500'>{errors.name?.message}</p>
                   )}
                 </div>
                 <div>
                   <input
                     disabled
-                    className={`focus:shadow-outline w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  ease-in-out focus:outline-none disabled:cursor-not-allowed
+                    className={`w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  ease-in-out focus:outline-none disabled:cursor-not-allowed
                  ${
                    errors.email
                      ? ' border border-red-500 bg-[#ffe6e6]'
                      : 'border-gray-400 bg-white hover:border-gray-500'
                  } `}
-                    type="text"
-                    id="email"
+                    type='text'
+                    id='email'
                     {...register('email')}
                     placeholder={`${errors.email ? '' : 'Email'}`}
                   />
-                  {errors.email && <p className="mt-2 pl-1 text-xs text-red-500">{errors.email?.message}</p>}
+                  {errors.email && <p className='mt-2 pl-1 text-xs text-red-500'>{errors.email?.message}</p>}
                 </div>
 
                 <div
-                  className="flex flex-row flex-wrap items-center justify-between space-y-2 whitespace-nowrap text-sm sm:space-y-0 sm:text-base"
+                  className='flex flex-row flex-wrap items-center justify-between space-y-2 whitespace-nowrap text-sm sm:space-y-0 sm:text-base'
                   style={{ marginTop: '1rem' }}
                 >
-                  <p className="flex items-center px-1">
+                  <p className='flex items-center px-1'>
                     Do you want to change your name?
                     <button
-                      type="submit"
+                      type='submit'
                       onClick={() => {
                         !errors.name && setChangeDetail((prevState) => !prevState);
                       }}
-                      className="ml-1 cursor-pointer text-red-600 transition duration-200 ease-in-out hover:text-red-700"
+                      className='ml-1 cursor-pointer text-red-600 transition duration-200 ease-in-out hover:text-red-700'
                     >
                       {changeDetail ? 'Apply change' : 'Edit'}
                     </button>
                   </p>
                   <button
                     onClick={LogoutHandler}
-                    className="cursor-pointer text-blue-600 transition duration-200 ease-in-out hover:text-blue-800"
+                    className='cursor-pointer text-blue-600 transition duration-200 ease-in-out hover:text-blue-800'
                   >
                     Sign out
                   </button>
                 </div>
               </form>
-              <Link to="/create-listing">
+              <Link to='/create-listing'>
                 <Button Icon={FcHome}>Sell or rent your home</Button>
               </Link>
             </div>
           </div>
+          {listings.length ? (
+            <>
+              <h2 className='text-center text-2xl font-semibold'>My Listing</h2>
+              <ul className='mx-auto my-6 grid max-w-6xl sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
+                {listings?.map((list) => (
+                  <ListingItem id={list.id} data={list} key={list.id} />
+                ))}
+              </ul>
+            </>
+          ) : null}
         </>
       ) : null}
     </section>
