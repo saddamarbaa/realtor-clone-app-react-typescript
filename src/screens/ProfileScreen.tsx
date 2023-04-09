@@ -23,11 +23,29 @@ import {
   updateDoc,
   where,
 } from 'firebase/firestore';
+import { motion } from 'framer-motion';
 import { ListingT } from 'types/listing';
 import { profileSchemaValidation } from 'utils/index';
+import { AnimationSettings } from 'utils/schemaValidation/animation';
 import { z as zod } from 'zod';
 
 type ValidationSchemaT = zod.infer<typeof profileSchemaValidation>;
+
+const listingsVariants = {
+  initial: { scale: 0.96, y: 30, opacity: 0 },
+  enter: {
+    scale: 1,
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.5, ease: [0.48, 0.15, 0.25, 0.96] },
+  },
+  exit: {
+    scale: 0.6,
+    y: 100,
+    opacity: 0,
+    transition: { duration: 0.2, ease: [0.48, 0.15, 0.25, 0.96] },
+  },
+};
 
 export default function ProfileScreen() {
   const [user, loading, error] = useAuthState(auth);
@@ -35,8 +53,6 @@ export default function ProfileScreen() {
   const [listings, setListings] = useState<ListingT[]>([]);
 
   const navigate = useNavigate();
-
-  console.log(listings);
 
   const {
     register,
@@ -107,8 +123,25 @@ export default function ProfileScreen() {
     navigate('/');
   };
 
+  const onDeleteHandler = async (id: string) => {
+    const shouldDelete = window.confirm('Are you sure to delete?');
+    if (!shouldDelete) return;
+
+    try {
+      await deleteDoc(doc(db, 'listings', id));
+      setListings(listings.filter((list) => list.id !== id));
+      toast.success('Successfully removed listing');
+    } catch (error) {
+      console.error('Failed to remove listing', error);
+      toast.error('Failed to remove listing');
+    }
+  };
+  const onEditHandler = (id: string) => {
+    navigate(`edit-listing/${id}`);
+  };
+
   return (
-    <section className='py-20'>
+    <motion.section className='py-20' {...AnimationSettings}>
       {loading ? (
         <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center  px-6 py-12'>
           <p className='mt-8 w-full max-w-lg rounded  border bg-white p-6 text-center font-bold'>
@@ -198,13 +231,21 @@ export default function ProfileScreen() {
               <h2 className='text-center text-2xl font-semibold'>My Listing</h2>
               <ul className='mx-auto my-6 grid max-w-6xl sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5'>
                 {listings?.map((list) => (
-                  <ListingItem id={list.id} data={list} key={list.id} />
+                  <motion.div variants={listingsVariants} key={list.id}>
+                    <ListingItem
+                      id={list.id}
+                      data={list}
+                      key={list.id}
+                      onDelete={onDeleteHandler}
+                      onEdit={onEditHandler}
+                    />
+                  </motion.div>
                 ))}
               </ul>
             </>
           ) : null}
         </>
       ) : null}
-    </section>
+    </motion.section>
   );
 }

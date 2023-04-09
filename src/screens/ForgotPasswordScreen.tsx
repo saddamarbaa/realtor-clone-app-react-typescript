@@ -6,6 +6,8 @@ import Button from 'components/Button';
 import OAuth from 'components/OAuth';
 import { auth, sendPasswordResetEmail } from 'config/firebase';
 import { FirebaseError } from 'firebase/app';
+import { motion } from 'framer-motion';
+import { AnimationSettings } from 'utils/schemaValidation/animation';
 import { forgotPasswordSchemaValidation } from 'utils/schemaValidation/auth';
 import { z as zod } from 'zod';
 
@@ -38,7 +40,7 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
-    <section className='py-20'>
+    <motion.section className='py-20' {...AnimationSettings}>
       <h1 className='mt-6 text-center text-3xl font-bold'>Forgot Password</h1>
       <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12'>
         <div className='mb-12 md:mb-6 md:w-[67%] lg:w-[50%]'>
@@ -91,6 +93,6 @@ export default function ForgotPasswordScreen() {
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
