@@ -9,7 +9,9 @@ import OAuth from 'components/OAuth';
 import { auth } from 'config/firebase';
 import { FirebaseError } from 'firebase/app';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { motion } from 'framer-motion';
 import { signInSchemaValidation } from 'utils/index';
+import { AnimationSettings } from 'utils/schemaValidation/animation';
 import { z as zod } from 'zod';
 
 type ValidationSchemaT = zod.infer<typeof signInSchemaValidation>;
@@ -42,7 +44,7 @@ export default function SignInScreen() {
   };
 
   return (
-    <section className='py-20'>
+    <motion.section className='py-20' {...AnimationSettings}>
       <h1 className='mt-6 text-center text-3xl font-bold'>Sign In</h1>
       <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12'>
         <div className='mb-12 md:mb-6 md:w-[67%] lg:w-[50%]'>
@@ -120,6 +122,6 @@ export default function SignInScreen() {
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

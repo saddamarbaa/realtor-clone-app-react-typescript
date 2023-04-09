@@ -10,7 +10,9 @@ import Spinner from 'components/Spinner';
 import { auth, db } from 'config/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
+import { motion } from 'framer-motion';
 import { listingSchemaValidation } from 'utils/index';
+import { AnimationSettings } from 'utils/schemaValidation/animation';
 import { v4 as uuidv4 } from 'uuid';
 import { z as zod } from 'zod';
 
@@ -156,7 +158,7 @@ export default function OffersScreen() {
   }
 
   return (
-    <section className='py-20'>
+    <motion.section className='py-20' {...AnimationSettings}>
       <h1 className='mt-6 text-center text-3xl font-bold'>Create Listing</h1>
       <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12'>
         <div className='flex w-full max-w-md flex-col space-y-4'>
@@ -483,6 +485,6 @@ export default function OffersScreen() {
           </form>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }

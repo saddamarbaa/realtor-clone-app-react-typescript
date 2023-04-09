@@ -9,7 +9,9 @@ import OAuth from 'components/OAuth';
 import { auth, createUserWithEmailAndPassword, db, updateProfile } from 'config/firebase';
 import { FirebaseError } from 'firebase/app';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { motion } from 'framer-motion';
 import { signUpSchemaValidation } from 'utils/index';
+import { AnimationSettings } from 'utils/schemaValidation/animation';
 import { z as zod } from 'zod';
 
 type ValidationSchemaT = zod.infer<typeof signUpSchemaValidation>;
@@ -59,8 +61,8 @@ export default function SignUpScreen() {
   };
 
   return (
-    <section className='py-20'>
-      <h1 className='mt-6 text-center text-3xl font-bold'>Sign Up</h1>
+    <motion.section className='py-20' {...AnimationSettings}>
+      <motion.h1 className='mt-6 text-center text-3xl font-bold'>Sign Up</motion.h1>
       <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12'>
         <div className='mb-12 md:mb-6 md:w-[67%] lg:w-[50%]'>
           <img src='/key.jpg' alt='key' className='w-full rounded-2xl' />
@@ -82,20 +84,18 @@ export default function SignUpScreen() {
               />
               {errors.name && <p className='mt-2 pl-1 text-xs text-red-500'>{errors.name?.message}</p>}
             </div>
-            <div>
+            <motion.div>
               <input
-                className={`w-full appearance-none rounded border p-3  leading-tight shadow transition duration-300 focus:shadow  focus:outline-none ${
-                  errors.email
-                    ? ' border border-red-500 bg-[#ffe6e6]'
-                    : 'border-gray-400 bg-white hover:border-gray-500'
+                className={` w-full appearance-none rounded border  p-3 leading-tight shadow transition duration-300  focus:outline-none ${
+                  errors.name ? ' border border-red-500 bg-[#ffe6e6]' : 'border-gray-400 bg-white hover:border-gray-500'
                 } `}
                 type='text'
-                id='email'
-                {...register('email')}
-                placeholder={`${errors.email ? '' : 'Email'}`}
+                id='name'
+                {...register('name')}
+                placeholder={`${errors.name ? '' : 'Name'}`}
               />
-              {errors.email && <p className='mt-2 pl-1 text-xs text-red-500'>{errors.email?.message}</p>}
-            </div>
+              {errors.name && <p className='mt-2 pl-1 text-xs text-red-500'>{errors.name?.message}</p>}
+            </motion.div>
             <div>
               <div>
                 <input
@@ -190,6 +190,6 @@ export default function SignUpScreen() {
           </div>
         </div>
       </div>
-    </section>
+    </motion.section>
   );
 }
