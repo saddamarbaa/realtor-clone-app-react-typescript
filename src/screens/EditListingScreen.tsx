@@ -10,9 +10,7 @@ import Spinner from 'components/Spinner';
 import { auth, db } from 'config/firebase';
 import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
-import { motion } from 'framer-motion';
 import { listingSchemaValidation } from 'utils/index';
-import { AnimationSettings } from 'utils/schemaValidation/animation';
 import { v4 as uuidv4 } from 'uuid';
 import { z as zod } from 'zod';
 
@@ -188,8 +186,8 @@ export default function EditListingScreen() {
   }
 
   return (
-    <motion.section className='py-20' {...AnimationSettings}>
-      <h1 className='mt-6 text-center text-3xl font-bold'>Create Listing</h1>
+    <section className='py-20'>
+      <h1 className='mt-6 text-center text-3xl font-bold'>Edit Listing</h1>
       <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12'>
         <div className='flex w-full max-w-md flex-col space-y-4'>
           <form className='flex w-full flex-col space-y-6' onSubmit={handleSubmit(onSubmit)}>
@@ -515,6 +513,6 @@ export default function EditListingScreen() {
           </form>
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }

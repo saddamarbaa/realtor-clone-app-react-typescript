@@ -2,6 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  body {
+    @apply min-h-screen;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .test {
+    @apply mb-5 w-full max-w-[305px] cursor-pointer;
+  }
+}
+
 body {
   background-color: rgb(240, 253, 244);
 }
+
+/* Overwrite swiper styles */
+.swiper-button-next:after,
+.swiper-button-prev:after {
+  color: #a8dadc;
+}
+
+.swiper-pagination-progressbar .swiper-pagination-progressbar-fill {
+  background: #a8dadc !important;
+}
+
+/* html::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  scrollbar-width: none;
+} */

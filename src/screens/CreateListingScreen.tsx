@@ -10,9 +10,7 @@ import Spinner from 'components/Spinner';
 import { auth, db } from 'config/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
-import { motion } from 'framer-motion';
 import { listingSchemaValidation } from 'utils/index';
-import { AnimationSettings } from 'utils/schemaValidation/animation';
 import { v4 as uuidv4 } from 'uuid';
 import { z as zod } from 'zod';
 
@@ -25,7 +23,6 @@ export default function CreateListingScreen() {
   const [geolocationEnabled, setGeoLocationEnabled] = useState(false);
   const [user, error] = useAuthState(auth);
   const [loading, setLoading] = useState(false);
-  const [isSuccess, setSuccess] = useState(false);
   const {
     register,
     setValue,
@@ -52,12 +49,6 @@ export default function CreateListingScreen() {
       latitude: 0,
       longitude: 0,
     });
-  }, []);
-
-  useEffect(() => {
-    if (isSuccess) {
-      navigate('/');
-    }
   }, []);
 
   const removeImage = (index: number) => {
@@ -124,7 +115,6 @@ export default function CreateListingScreen() {
   }
 
   const onSubmit: SubmitHandler<ValidationSchemaT> = async (data) => {
-    setLoading(true);
     const geolocation = {
       lat: data.latitude || -8.3405389,
       lng: data.longitude || 115.0919509,
@@ -134,7 +124,8 @@ export default function CreateListingScreen() {
       // const result = listingSchemaValidation.parse(data);
       // console.log('Valid data:', result);
 
-      if (imageFiles.length) {
+      if (imageFiles.length > 0) {
+        setLoading(true);
         const imgUrls = await Promise.all([...imageFiles].map((image) => storeImage(image))).catch((error) => {
           setLoading(false);
           toast.error('Images not uploaded');
@@ -153,7 +144,8 @@ export default function CreateListingScreen() {
         setLoading(false);
         toast.success('Listing created');
         navigate(`/category/${formDataCopy.type}/${docRef.id}`);
-        setSuccess(true);
+      } else {
+        toast.error('Please upload at least one image');
       }
     } catch (error) {
       console.error('Validation error:', error);
@@ -166,7 +158,7 @@ export default function CreateListingScreen() {
   }
 
   return (
-    <motion.section className='py-20' {...AnimationSettings}>
+    <section className='py-20'>
       <h1 className='mt-6 text-center text-3xl font-bold'>Create Listing</h1>
       <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12'>
         <div className='flex w-full max-w-md flex-col space-y-4'>
@@ -493,6 +485,6 @@ export default function CreateListingScreen() {
           </form>
         </div>
       </div>
-    </motion.section>
+    </section>
   );
 }
