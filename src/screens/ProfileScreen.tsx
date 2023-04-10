@@ -137,7 +137,7 @@ export default function ProfileScreen() {
     }
   };
   const onEditHandler = (id: string) => {
-    navigate(`edit-listing/${id}`);
+    navigate(`/edit-listing/${id}`);
   };
 
   return (

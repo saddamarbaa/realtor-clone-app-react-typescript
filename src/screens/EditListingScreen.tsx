@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { FaTrash } from 'react-icons/fa';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Button from 'components/Button';
 import Spinner from 'components/Spinner';
 import { auth, db } from 'config/firebase';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
 import { motion } from 'framer-motion';
 import { listingSchemaValidation } from 'utils/index';
@@ -18,14 +18,14 @@ import { z as zod } from 'zod';
 
 type ValidationSchemaT = zod.infer<typeof listingSchemaValidation>;
 
-export default function CreateListingScreen() {
+export default function EditListingScreen() {
   const navigate = useNavigate();
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [geolocationEnabled, setGeoLocationEnabled] = useState(false);
   const [user, error] = useAuthState(auth);
   const [loading, setLoading] = useState(false);
-  const [isSuccess, setSuccess] = useState(false);
+  const [listing, setListing] = useState<any>(null);
   const {
     register,
     setValue,
@@ -39,26 +39,51 @@ export default function CreateListingScreen() {
     resolver: zodResolver(listingSchemaValidation),
   });
 
-  useEffect(() => {
-    reset({
-      bedRoom: 2,
-      bathRoom: 1,
-      regularPrice: 0,
-      discountedPrice: 0,
-      type: 'rent',
-      parking: false,
-      furnished: false,
-      offer: false,
-      latitude: 0,
-      longitude: 0,
-    });
-  }, []);
+  const params = useParams();
+
+  const { listingID } = useParams<{ listingID: string }>();
 
   useEffect(() => {
-    if (isSuccess) {
+    if (listing && listing.userRef !== user?.uid) {
+      toast.error("You can't edit this listing");
       navigate('/');
     }
-  }, []);
+  }, [user?.uid, listing, navigate]);
+
+  useEffect(() => {
+    setLoading(true);
+    async function fetchListing() {
+      const docRef = doc(db, 'listings', listingID as string);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = { ...docSnap.data() };
+
+        reset({
+          bedRoom: data?.bedRoom || 2,
+          bathRoom: data?.bathRoom || 1,
+          regularPrice: data?.regularPrice || 0,
+          discountedPrice: data?.discountedPrice || 0,
+          type: data?.type || 'rent',
+          parking: data?.parking,
+          furnished: data?.furnished || false,
+          offer: data?.offer || false,
+          latitude: 0,
+          longitude: 0,
+          description: data?.description,
+          address: data?.address,
+          name: data?.name,
+        });
+
+        setListing(docSnap.data());
+        setLoading(false);
+        setImagePreviews([...data.imgUrls]);
+      } else {
+        navigate('/');
+        toast.error('Listing does not exist');
+      }
+    }
+    fetchListing();
+  }, [navigate, params.listingId]);
 
   const removeImage = (index: number) => {
     const newFiles = [...imageFiles];
@@ -131,30 +156,27 @@ export default function CreateListingScreen() {
     };
 
     try {
-      // const result = listingSchemaValidation.parse(data);
-      // console.log('Valid data:', result);
+      const imgUrls = imageFiles.length
+        ? await Promise.all([...imageFiles].map((image) => storeImage(image))).catch((error) => {
+            setLoading(false);
+            toast.error('Images not uploaded');
+          })
+        : listing?.imgUrls || [];
 
-      if (imageFiles.length) {
-        const imgUrls = await Promise.all([...imageFiles].map((image) => storeImage(image))).catch((error) => {
-          setLoading(false);
-          toast.error('Images not uploaded');
-        });
+      const formDataCopy = {
+        ...data,
+        imgUrls,
+        geolocation,
+        timestamp: serverTimestamp(),
+        userRef: user?.uid,
+      };
 
-        const formDataCopy = {
-          ...data,
-          imgUrls,
-          geolocation,
-          timestamp: serverTimestamp(),
-          userRef: user?.uid,
-        };
+      const docRef = doc(db, 'listings', listingID as string);
 
-        const docRef = await addDoc(collection(db, 'listings'), formDataCopy);
-
-        setLoading(false);
-        toast.success('Listing created');
-        navigate(`/category/${formDataCopy.type}/${docRef.id}`);
-        setSuccess(true);
-      }
+      await updateDoc(docRef, formDataCopy);
+      navigate(`/category/${formDataCopy.type}/${docRef.id}`);
+      setLoading(false);
+      toast.success('Listing Edited');
     } catch (error) {
       console.error('Validation error:', error);
       throw error;
@@ -469,7 +491,7 @@ export default function CreateListingScreen() {
                 id='images'
                 onChange={handleImageChange}
                 multiple
-                required
+                required={false}
                 max='3'
                 accept='.jpg,.png,.jpeg,.webp'
               />
@@ -489,7 +511,7 @@ export default function CreateListingScreen() {
                 ))}
               </div>
             </div>
-            <Button> Create Listing</Button>
+            <Button> Edit Listing</Button>
           </form>
         </div>
       </div>

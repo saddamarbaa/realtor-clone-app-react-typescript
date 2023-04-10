@@ -3,6 +3,7 @@ import { Route, Routes, useLocation } from 'react-router-dom';
 import PrivateRoute from 'components/PrivateRoute';
 import { AnimatePresence } from 'framer-motion';
 import CreateListingScreen from 'screens/CreateListingScreen';
+import EditListingScreen from 'screens/EditListingScreen';
 import ForgotPasswordScreen from 'screens/ForgotPasswordScreen';
 import HomeScreen from 'screens/HomeScreen';
 import NotFoundScreen from 'screens/NotFoundScreen';
@@ -27,6 +28,9 @@ export default function AnimatedRoutes() {
         <Route path='/offers' element={<OffersScreen />} />
         <Route path='/create-listing' element={<PrivateRoute />}>
           <Route path='/create-listing' element={<CreateListingScreen />} />
+        </Route>
+        <Route path='/edit-listing' element={<PrivateRoute />}>
+          <Route path='/edit-listing/:listingID' element={<EditListingScreen />} />
         </Route>
         <Route path='*' element={<NotFoundScreen />} />
       </Routes>
