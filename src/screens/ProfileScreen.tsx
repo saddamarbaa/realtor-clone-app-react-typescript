@@ -141,7 +141,7 @@ export default function ProfileScreen() {
   };
 
   return (
-    <motion.section className='py-20' {...AnimationSettings}>
+    <motion.section className='py-20 pt-8' {...AnimationSettings}>
       {loading ? (
         <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center  px-6 py-12'>
           <p className='mt-8 w-full max-w-lg rounded  border bg-white p-6 text-center font-bold'>

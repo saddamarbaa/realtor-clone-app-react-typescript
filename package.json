@@ -12,13 +12,14 @@
     "check-lint": "eslint . --ext ts --ext tsx --ext js",
     "fix-lint": "eslint . --ext ts --ext tsx --ext js --fix",
     "format": "prettier --write .",
-    "test-all": "yarn run check-format && yarn run check-lint && yarn run check-types && yarn run build",
+    "test-all": "npm run check-format && npm run check-lint && npm run check-types && npm run build",
     "pre-commit": "lint-staged"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.0.0",
     "firebase": "^9.18.0",
     "framer-motion": "^10.11.2",
+    "leaflet": "^1.9.3",
     "localforage": "^1.10.0",
     "match-sorter": "^6.3.1",
     "moment": "^2.29.4",
@@ -27,6 +28,7 @@
     "react-firebase-hooks": "^5.1.1",
     "react-hook-form": "^7.43.8",
     "react-icons": "^4.8.0",
+    "react-leaflet": "^4.2.1",
     "react-router": "^6.9.0",
     "react-router-dom": "^6.9.0",
     "react-toastify": "^9.1.2",
@@ -36,6 +38,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@types/leaflet": "^1.9.3",
     "@types/node": "^18.15.10",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
@@ -70,7 +73,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "yarn run pre-commit"
+      "pre-commit": "npm run pre-commit"
     }
   },
   "lint-staged": {
@@ -79,9 +82,9 @@
       "git add"
     ],
     ".": [
-      "yarn run check-format",
-      "yarn run check-lint",
-      "yarn run check-types"
+      "npm run check-format",
+      "npm run check-lint",
+      "npm run check-types"
     ]
   },
   "repository": "https://github.com/saddamarbaa/realtor-clone-app-react-typescript",
