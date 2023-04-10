@@ -13,7 +13,7 @@ export const listingSchemaValidation = zod.object({
   description: zod
     .string()
     .nonempty({ message: 'Description is required' })
-    .max(100, { message: 'Description must not exceed 10 characters' }),
+    .max(500, { message: 'Description must not exceed 500 characters' }),
   bedRoom: zod.number().min(0, { message: 'Bed Room must be at least 0' }),
   bathRoom: zod.number().min(0, { message: 'Path Room must be at least 0' }),
   regularPrice: zod.number().min(0, { message: 'Price must be at least 0' }),
