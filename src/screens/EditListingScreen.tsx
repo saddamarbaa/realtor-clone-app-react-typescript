@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { FaTrash } from 'react-icons/fa';
-import { useNavigate } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { toast } from 'react-toastify';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Button from 'components/Button';
 import Spinner from 'components/Spinner';
 import { auth, db } from 'config/firebase';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, updateDoc, where } from 'firebase/firestore';
 import { getDownloadURL, getStorage, ref, uploadBytes, uploadBytesResumable } from 'firebase/storage';
 import { listingSchemaValidation } from 'utils/index';
 import { v4 as uuidv4 } from 'uuid';
@@ -16,13 +16,14 @@ import { z as zod } from 'zod';
 
 type ValidationSchemaT = zod.infer<typeof listingSchemaValidation>;
 
-export default function CreateListingScreen() {
+export default function EditListingScreen() {
   const navigate = useNavigate();
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [geolocationEnabled, setGeoLocationEnabled] = useState(false);
   const [user, error] = useAuthState(auth);
   const [loading, setLoading] = useState(false);
+  const [listing, setListing] = useState<any>(null);
   const {
     register,
     setValue,
@@ -36,20 +37,51 @@ export default function CreateListingScreen() {
     resolver: zodResolver(listingSchemaValidation),
   });
 
+  const params = useParams();
+
+  const { listingID } = useParams<{ listingID: string }>();
+
   useEffect(() => {
-    reset({
-      bedRoom: 2,
-      bathRoom: 1,
-      regularPrice: 0,
-      discountedPrice: 0,
-      type: 'rent',
-      parking: false,
-      furnished: false,
-      offer: false,
-      latitude: 0,
-      longitude: 0,
-    });
-  }, []);
+    if (listing && listing.userRef !== user?.uid) {
+      toast.error("You can't edit this listing");
+      navigate('/');
+    }
+  }, [user?.uid, listing, navigate]);
+
+  useEffect(() => {
+    setLoading(true);
+    async function fetchListing() {
+      const docRef = doc(db, 'listings', listingID as string);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        const data = { ...docSnap.data() };
+
+        reset({
+          bedRoom: data?.bedRoom || 2,
+          bathRoom: data?.bathRoom || 1,
+          regularPrice: data?.regularPrice || 0,
+          discountedPrice: data?.discountedPrice || 0,
+          type: data?.type || 'rent',
+          parking: data?.parking,
+          furnished: data?.furnished || false,
+          offer: data?.offer || false,
+          latitude: 0,
+          longitude: 0,
+          description: data?.description,
+          address: data?.address,
+          name: data?.name,
+        });
+
+        setListing(docSnap.data());
+        setLoading(false);
+        setImagePreviews([...data.imgUrls]);
+      } else {
+        navigate('/');
+        toast.error('Listing does not exist');
+      }
+    }
+    fetchListing();
+  }, [navigate, params.listingId]);
 
   const removeImage = (index: number) => {
     const newFiles = [...imageFiles];
@@ -115,38 +147,34 @@ export default function CreateListingScreen() {
   }
 
   const onSubmit: SubmitHandler<ValidationSchemaT> = async (data) => {
+    setLoading(true);
     const geolocation = {
       lat: data.latitude || -8.3405389,
       lng: data.longitude || 115.0919509,
     };
 
     try {
-      // const result = listingSchemaValidation.parse(data);
-      // console.log('Valid data:', result);
+      const imgUrls = imageFiles.length
+        ? await Promise.all([...imageFiles].map((image) => storeImage(image))).catch((error) => {
+            setLoading(false);
+            toast.error('Images not uploaded');
+          })
+        : listing?.imgUrls || [];
 
-      if (imageFiles.length > 0) {
-        setLoading(true);
-        const imgUrls = await Promise.all([...imageFiles].map((image) => storeImage(image))).catch((error) => {
-          setLoading(false);
-          toast.error('Images not uploaded');
-        });
+      const formDataCopy = {
+        ...data,
+        imgUrls,
+        geolocation,
+        timestamp: serverTimestamp(),
+        userRef: user?.uid,
+      };
 
-        const formDataCopy = {
-          ...data,
-          imgUrls,
-          geolocation,
-          timestamp: serverTimestamp(),
-          userRef: user?.uid,
-        };
+      const docRef = doc(db, 'listings', listingID as string);
 
-        const docRef = await addDoc(collection(db, 'listings'), formDataCopy);
-
-        setLoading(false);
-        toast.success('Listing created');
-        navigate(`/category/${formDataCopy.type}/${docRef.id}`);
-      } else {
-        toast.error('Please upload at least one image');
-      }
+      await updateDoc(docRef, formDataCopy);
+      navigate(`/category/${formDataCopy.type}/${docRef.id}`);
+      setLoading(false);
+      toast.success('Listing Edited');
     } catch (error) {
       console.error('Validation error:', error);
       throw error;
@@ -159,7 +187,7 @@ export default function CreateListingScreen() {
 
   return (
     <section className='py-20'>
-      <h1 className='mt-6 text-center text-3xl font-bold'>Create Listing</h1>
+      <h1 className='mt-6 text-center text-3xl font-bold'>Edit Listing</h1>
       <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center px-6 py-12'>
         <div className='flex w-full max-w-md flex-col space-y-4'>
           <form className='flex w-full flex-col space-y-6' onSubmit={handleSubmit(onSubmit)}>
@@ -461,7 +489,7 @@ export default function CreateListingScreen() {
                 id='images'
                 onChange={handleImageChange}
                 multiple
-                required
+                required={false}
                 max='3'
                 accept='.jpg,.png,.jpeg,.webp'
               />
@@ -481,7 +509,7 @@ export default function CreateListingScreen() {
                 ))}
               </div>
             </div>
-            <Button> Create Listing</Button>
+            <Button> Edit Listing</Button>
           </form>
         </div>
       </div>

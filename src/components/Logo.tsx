@@ -5,7 +5,7 @@ export default function Logo() {
   return (
     <div>
       <img
-        src='./rdc-logo-default.svg'
+        src='/rdc-logo-default.svg'
         alt='Realtor Logo'
         className='h-6 cursor-pointer'
         onClick={() => navigate('/')}
