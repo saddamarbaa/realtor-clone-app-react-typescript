@@ -32,10 +32,12 @@ body {
   background: #a8dadc !important;
 }
 
-/* html::-webkit-scrollbar {
+/* Remove scrollbar in chrome */
+ html::-webkit-scrollbar {
   display: none;
 }
 
+/* Remove scrollbar in firefox */
 html {
   scrollbar-width: none;
-} */
+} 
