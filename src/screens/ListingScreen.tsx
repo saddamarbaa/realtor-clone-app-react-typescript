@@ -55,6 +55,7 @@ export default function ListingScreen() {
   if (loading) {
     return <Spinner />;
   }
+
   return (
     <section className='flex w-full flex-col space-y-5'>
       <div className='w-full'>
