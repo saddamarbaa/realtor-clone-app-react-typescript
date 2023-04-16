@@ -11,7 +11,7 @@ export default function Header() {
   const pathMathRoute = (route: string) => route === pathname;
 
   return (
-    <div className='sticky top-0 z-40 border-b bg-white shadow-sm'>
+    <div className='sticky top-0 z-40 w-full border-b  bg-white shadow-sm'>
       <header className='mx-auto flex max-w-6xl flex-col items-center justify-between space-y-4 p-4 sm:flex-row sm:space-y-0'>
         <Logo />
         <ul className='flex flex-col items-center space-y-1 sm:flex-row sm:space-x-10 sm:space-y-0'>

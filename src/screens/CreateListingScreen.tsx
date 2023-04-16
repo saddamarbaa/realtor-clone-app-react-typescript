@@ -322,9 +322,10 @@ export default function CreateListingScreen() {
                     className='w-full appearance-none rounded border  border-gray-400 bg-white p-3 text-center leading-tight shadow transition duration-300 hover:border-gray-500 focus:outline-none '
                     type='number'
                     id='latitude'
+                    inputMode='numeric'
                     min='-90'
                     max='90'
-                    {...register('latitude')}
+                    {...register('latitude', { valueAsNumber: true })}
                     placeholder='Latitude'
                   />
                 </div>
@@ -335,12 +336,13 @@ export default function CreateListingScreen() {
                   </label>
                   <input
                     className='w-full appearance-none rounded border  border-gray-400 bg-white p-3 text-center leading-tight shadow transition duration-300 hover:border-gray-500 focus:outline-none '
-                    type='number'
                     id='longitude'
-                    min='-180'
                     max='180'
-                    {...register('longitude')}
+                    type='number'
+                    min='-180'
+                    inputMode='numeric'
                     placeholder='Longitude'
+                    {...register('longitude', { valueAsNumber: true })}
                   />
                 </div>
               </div>
@@ -440,7 +442,6 @@ export default function CreateListingScreen() {
                     <p className='mt-2 pl-1 text-xs text-red-500'>{errors.discountedPrice?.message}</p>
                   )}
                 </div>
-                watch('offer')
                 {watch('type') === 'rent' && (
                   <div className=''>
                     <p className='w-full whitespace-nowrap pt-5 text-lg'>$ / Month</p>

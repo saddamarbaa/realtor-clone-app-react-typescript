@@ -33,6 +33,7 @@ export default function HomeScreen() {
           orderBy('timestamp', 'desc'),
           limit(offersLimit),
         );
+
         const unsubscribe = onSnapshot(listingQuery, (snapshot) => {
           const result: ListingT[] = [];
           snapshot.forEach((doc) => {
@@ -126,7 +127,7 @@ export default function HomeScreen() {
   }
 
   return (
-    <div>
+    <div className='flex w-full flex-1 flex-col'>
       <Slider />
       <div className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'>
         {/* Offers */}

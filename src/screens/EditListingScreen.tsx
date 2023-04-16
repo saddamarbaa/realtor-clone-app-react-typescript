@@ -352,7 +352,7 @@ export default function EditListingScreen() {
                     id='latitude'
                     min='-90'
                     max='90'
-                    {...register('latitude')}
+                    {...register('latitude', { valueAsNumber: true })}
                     placeholder='Latitude'
                   />
                 </div>
@@ -367,7 +367,7 @@ export default function EditListingScreen() {
                     id='longitude'
                     min='-180'
                     max='180'
-                    {...register('longitude')}
+                    {...register('longitude', { valueAsNumber: true })}
                     placeholder='Longitude'
                   />
                 </div>

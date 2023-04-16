@@ -5,7 +5,7 @@ export const listingSchemaValidation = zod.object({
     .string()
     .nonempty({ message: 'Name is required' })
     .min(10, { message: 'Name must be at least 10 characters' })
-    .max(15, { message: 'Name must not exceed 15 characters' }),
+    .max(45, { message: 'Name must not exceed 45 characters' }),
   address: zod
     .string()
     .nonempty({ message: 'Address is required' })

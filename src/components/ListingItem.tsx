@@ -36,7 +36,7 @@ export default function ListingItem({ onDelete, onEdit, data, id }: Props) {
         <div className='w-full p-[10px]'>
           <div className='flex items-center space-x-1'>
             <MdLocationOn className='h-4 w-4 text-green-600' />
-            <p>{data.address}</p>
+            <p className='truncate '>{data.address}</p>
           </div>
           <motion.p
             className='m-0 truncate text-xl font-semibold'
@@ -53,7 +53,7 @@ export default function ListingItem({ onDelete, onEdit, data, id }: Props) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.5 }}
           >
-            {`${data.offer ? data.discountedPrice : data.regularPrice}`} {data?.type === 'rent' ? '/ Month' : ''}
+            {`${data.offer ? data.discountedPrice : data.regularPrice}`} {data?.type === 'rent' ? '/ Month' : '/ Month'}
           </motion.p>
 
           <div className='mt-[10px] flex items-center space-x-2'>
