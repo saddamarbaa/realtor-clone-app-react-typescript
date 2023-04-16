@@ -21,7 +21,7 @@ export default function ListingScrmneen() {
   useEffect(() => {
     setLoading(true);
     const listingRef = collection(db, 'listings');
-    const listingQuery = query(listingRef, orderBy('timestamp', 'desc'), limit(5));
+    const listingQuery = query(listingRef, orderBy('timestamp', 'asc'), limit(5));
     const unsubscribe = onSnapshot(listingQuery, (snapshot) => {
       const result: ListingT[] = [];
       snapshot.forEach((doc) => {
@@ -45,8 +45,10 @@ export default function ListingScrmneen() {
 
   if (!loading && listing.length === 0) {
     return (
-      <div className='mx-auto flex max-w-6xl flex-wrap items-center justify-center  px-6 py-12'>
-        <p className='mt-8 w-full max-w-lg rounded  border bg-white p-6 text-center font-bold'>No Listing found</p>
+      <div className='mx-auto flex h-full w-full max-w-6xl flex-1 flex-wrap items-center justify-center px-6 py-12'>
+        <div className='w-full max-w-2xl cursor-pointer overflow-hidden rounded-lg bg-white p-10 shadow transition duration-300 ease-in-out hover:-translate-y-1 hover:bg-gray-100 hover:shadow-md'>
+          <p className='text-center font-bold'>No Listing found</p>
+        </div>
       </div>
     );
   }

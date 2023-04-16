@@ -33,11 +33,11 @@ body {
 }
 
 /* Remove scrollbar in chrome */
- html::-webkit-scrollbar {
+html::-webkit-scrollbar {
   display: none;
 }
 
 /* Remove scrollbar in firefox */
 html {
   scrollbar-width: none;
-} 
+}
