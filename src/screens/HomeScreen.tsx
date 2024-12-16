@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import ListingItem from 'components/ListingItem';
+import ShimmerList from 'components/ShimmerList';
 import Slider from 'components/Slider';
-import Spinner from 'components/Spinner';
+
 import { db } from 'config/firebase';
 import { collection, doc, getDoc, limit, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { ListingT } from 'types/listing';
@@ -60,6 +61,7 @@ export default function HomeScreen() {
   useEffect(() => {
     const fetchSalesListing = async () => {
       try {
+        setLoading(true);
         const saleListingRef = collection(db, 'listings');
         const saleListingQuery = query(
           saleListingRef,
@@ -76,7 +78,9 @@ export default function HomeScreen() {
             };
             result.push(data as ListingT);
           });
+          setLoading(false);
           setSalesListing(result);
+          console.log('been');
         });
         return () => {
           unsubscribe();
@@ -122,9 +126,7 @@ export default function HomeScreen() {
     fetchRentalsListing();
   }, [rentalsLimit]);
 
-  if (loading) {
-    return <Spinner />;
-  }
+  if (loading) return <ShimmerList />;
 
   return (
     <div className='flex w-full flex-1 flex-col'>
