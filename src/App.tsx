@@ -1,6 +1,6 @@
-import { BrowserRouter as Router, Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import Layout from 'layouts/indest';
+import Layout from 'layouts/index';
 
 import AnimatedRoutes from './AnimationLayout';
 
